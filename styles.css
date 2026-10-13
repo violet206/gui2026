@@ -1,0 +1,2616 @@
+:root {
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --glass-shadow: rgba(0, 0, 0, 0.1);
+    --accent-blue: rgba(77, 171, 247, 0.8);
+    --accent-cyan: rgba(34, 197, 194, 0.8);
+    --text-primary: rgba(255, 255, 255, 0.95);
+    --text-secondary: rgba(255, 255, 255, 0.7);
+    --backdrop-filter: blur(20px) saturate(180%);
+    /* 统一圆角 (可全局调) */
+    --radius-global: 22px;
+    --radius-medium: 16px; /* 次级块/按钮 */
+    --radius-small: 12px;  /* 小按钮/徽标 */
+}
+
+/* ===================== Header Entrance Animations (from style2.css, integrated) ===================== */
+@keyframes uiTopIn { from { transform:translateY(-60%); opacity:0;} to { transform:translateY(0); opacity:1;} }
+@keyframes uiSideInLeft { from { transform:translateX(-40%); opacity:0;} to { transform:translateX(0); opacity:1;} }
+@keyframes uiBottomIn { from { transform:translateY(40%); opacity:0;} to { transform:translateY(0); opacity:1;} }
+
+/* 动画可通过给 <body> 添加 .no-animate 或用户系统偏好 reduced motion 自动停用 */
+@media (prefers-reduced-motion: reduce){
+    .animated-header * { animation:none !important; }
+}
+body.no-animate .animated-header * { animation:none !important; }
+
+header.animated-header { --anim-base-delay:0.15s; }
+header.animated-header .title { animation: uiTopIn 1s ease-out var(--anim-base-delay) forwards; opacity:0; }
+header.animated-header .subtitle { animation: uiSideInLeft 0.9s ease-out calc(var(--anim-base-delay) + 0.25s) forwards; opacity:0; }
+header.animated-header + .globe-section { animation: uiBottomIn 1.1s ease-out calc(var(--anim-base-delay) + 0.4s) forwards; opacity:0; }
+
+/* 新增：标题与副标题垂直紧凑容器，使副标题紧贴主标题且居中不超宽 */
+.title-block { max-width: 1180px; margin: 0 auto 12px auto; padding: 0 16px; line-height:1.15; }
+.title-block .title { margin-bottom:6px; }
+.title-block .subtitle { margin-top:0; font-size:clamp(.9rem,1.6vw,1.25rem); letter-spacing:4px; opacity:.85; }
+
+/* 提供一个类快速禁用单个元素动画 */
+.no-entry-anim { animation:none !important; opacity:1 !important; }
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* 液态玻璃卡片基础样式 */
+.glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: var(--backdrop-filter);
+    -webkit-backdrop-filter: var(--backdrop-filter);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-global);
+    box-shadow: 
+        0 8px 32px var(--glass-shadow),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.glass-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+}
+
+.glass-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 
+        0 16px 48px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* 居中标题样式 */
+.header {
+    text-align: center;
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #fff, #a8dadc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    animation: glow-pulse 3s ease-in-out infinite alternate;
+}
+
+@keyframes glow-pulse {
+    from {
+        filter: drop-shadow(0 0 10px rgba(168, 218, 220, 0.6));
+        transform: scale(1);
+    }
+    to {
+        filter: drop-shadow(0 0 25px rgba(168, 218, 220, 0.9));
+        transform: scale(1.02);
+    }
+}
+
+/* 液态玻璃微动画 */
+@keyframes glassFloat {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-2px); }
+}
+
+.glass-card {
+    animation: glassFloat 6s ease-in-out infinite;
+}
+
+.glass-card:nth-child(2n) {
+    animation-delay: -2s;
+}
+
+.glass-card:nth-child(3n) {
+    animation-delay: -4s;
+}
+
+body {
+    font-family: 'Roboto', Arial, sans-serif;
+    background: linear-gradient(135deg, #0a1a2e 0%, #16213e 25%, #0f4c75 50%, #16213e 75%, #0a1a2e 100%);
+    color: #ffffff;
+    overflow-x: hidden;
+}
+
+/* ===================== 漂流模拟区域 ===================== */
+.drift-section { width:95%; margin:0 auto 20px; }
+.drift-panel-wrapper { padding:26px 28px 30px; background:linear-gradient(165deg,#0d1f2b 0%, #071823 55%, #06141f 100%); }
+.drift-sim-root-host { position:relative; }
+.drift-sim-root { display:flex; flex-direction:column; gap:12px; }
+.drift-canvas-wrap { position:relative; width:100%; height:300px; border:1px solid rgba(255,255,255,0.08); border-radius:18px; overflow:hidden; background:linear-gradient(180deg,#03121c 0%, #052234 48%, #04131c 49%, #04131c 100%); }
+.drift-canvas { width:100%; height:100%; display:block; }
+.drift-control-bar { display:flex; flex-wrap:wrap; gap:10px; padding:10px 14px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:16px; }
+.drift-control-bar button { flex:0 0 auto; background:linear-gradient(145deg, rgba(0,160,255,0.18), rgba(0,210,255,0.22)); border:1px solid rgba(0,180,255,0.45); color:#9ee8ff; padding:8px 16px; font-size:0.72rem; letter-spacing:.5px; border-radius:18px; cursor:pointer; font-weight:600; transition:.25s; backdrop-filter:blur(10px); }
+.drift-control-bar button:hover { transform:translateY(-2px); background:linear-gradient(145deg, rgba(0,190,255,0.32), rgba(0,230,255,0.36)); }
+.drift-control-bar button:active { transform:translateY(0); }
+.drift-legend { display:flex; flex-wrap:wrap; gap:10px; padding:8px 10px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:14px; min-height:38px; }
+.drift-legend-item { display:flex; align-items:center; gap:6px; background:rgba(255,255,255,0.06); padding:4px 8px 4px 6px; border-radius:14px; font-size:10px; letter-spacing:.4px; }
+.drift-legend-color { width:14px; height:14px; border-radius:50%; box-shadow:0 0 0 1px rgba(255,255,255,0.25) inset,0 0 6px currentColor; }
+.drift-log { font-family: "JetBrains Mono", monospace; white-space:pre-wrap; max-height:110px; overflow:auto; background:linear-gradient(145deg,#0c1218,#101e29); border:1px solid rgba(255,255,255,0.07); border-radius:14px; padding:8px 10px; font-size:11px; line-height:1.35; color:#b9ddff; box-shadow: inset 0 2px 4px rgba(0,0,0,0.4); }
+.drift-log::-webkit-scrollbar { width:8px; }
+.drift-log::-webkit-scrollbar-thumb { background:rgba(120,170,210,0.25); border-radius:4px; }
+.drift-notice { background:linear-gradient(90deg,#d35400,#c0392b); color:#fff; padding:8px 14px; border-radius:10px; font-size:11px; letter-spacing:.5px; margin-top:4px; font-weight:600; box-shadow:0 2px 8px -2px rgba(211,84,0,0.45); }
+.mini-close-btn { background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:#d0e9ff; cursor:pointer; transition:.25s; }
+.mini-close-btn:hover { background:rgba(255,255,255,0.15); }
+@media (max-width:900px){ .drift-canvas-wrap { height:240px; } }
+@media (max-width:640px){ .drift-canvas-wrap { height:200px; } .drift-control-bar button { font-size:0.65rem; padding:7px 12px; } }
+
+
+/* 指定用户要求：以下几个块宽度为视口的 95%，内部维持自适应：
+   - components-section
+   - .panel.glass-card.simulation-controls (模拟运行中心)
+   - .panel.globe-panel.glass-card (地球面板)
+   - .panel.info-panel (关键概念)
+   - footer
+   同时华容道主容器 (.huarong-puzzle-container.panel-grid-8.glass-card) 宽度为 90%。
+   采用百分比而不是 vw，避免出现横向滚动条时计算不一致。
+*/
+.components-section,
+.panel.glass-card.simulation-controls,
+.panel.globe-panel.glass-card,
+.panel.info-panel,
+footer.footer { width:95%; margin-left:auto; margin-right:auto; }
+
+/* 统一主块之间垂直间距：globe-section、simulation-controls、components-section、info-section、footer 之间 20px */
+.globe-section,
+.panel.glass-card.simulation-controls,
+.components-section,
+.info-section,
+footer.footer { margin-top:0; margin-bottom:20px; }
+.main-content > .globe-section:first-of-type { margin-top:0; }
+
+/* 模拟运行中心按钮容器与按钮风格统一 */
+
+/* 统一模拟中心两按钮尺寸（满宽700px，字体/内边距一致） */
+.simulation-controls .sim-buttons.unified {
+    display: flex;
+    justify-content: center;
+}
+.simulation-controls .unified-run-btn,
+.simulation-controls .demo-btn {
+    flex: 1 1 auto;
+    max-width: 700px;
+    min-width: 0;
+    font-size: 0.9rem;
+    padding: 14px 26px;
+    border-radius: var(--radius-medium);
+    box-sizing: border-box;
+    width: 100%;
+    height: auto;
+}
+.simulation-controls .unified-run-btn {
+    background: linear-gradient(90deg, rgba(80,120,255,0.35), rgba(155,80,255,0.35));
+    border: 1px solid rgba(120,180,255,0.55);
+    color: #e6f7ff;
+    font-weight: 600;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 18px -4px rgba(80,120,255,.35),0 0 0 1px rgba(255,255,255,0.05) inset;
+    transition: background .25s, transform .25s, box-shadow .25s;
+}
+.simulation-controls .unified-run-btn:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(90deg, rgba(100,150,255,0.55), rgba(175,100,255,0.55));
+    box-shadow: 0 6px 22px -4px rgba(90,140,255,.55),0 0 0 1px rgba(255,255,255,0.08) inset;
+}
+.simulation-controls .unified-run-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 3px 10px -2px rgba(90,140,255,.5),0 0 0 1px rgba(255,255,255,0.1) inset;
+}
+.simulation-controls .demo-btn {
+    background: linear-gradient(90deg, rgba(34,197,194,0.18), rgba(77,171,247,0.18));
+    border: 1px solid rgba(77,171,247,0.38);
+    color: #40e0ff;
+    font-weight: 600;
+    letter-spacing: 1px;
+    box-shadow: 0 2px 10px -2px rgba(34,197,194,.18),0 0 0 1px rgba(255,255,255,0.04) inset;
+    transition: background .25s, transform .25s, box-shadow .25s;
+}
+.simulation-controls .demo-btn:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(90deg, rgba(34,197,194,0.32), rgba(77,171,247,0.32));
+    box-shadow: 0 4px 16px -2px rgba(34,197,194,.28),0 0 0 1px rgba(255,255,255,0.07) inset;
+}
+.simulation-controls .demo-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 6px -1px rgba(34,197,194,.18),0 0 0 1px rgba(255,255,255,0.09) inset;
+}
+
+/* ===== 年度误管理塑料趋势面板增强 ===== */
+.huarong-piece .yearly-chart-wrap{position:relative;flex:1 1 auto;min-height:240px;display:flex;align-items:stretch;}
+.huarong-piece .yearly-chart-wrap canvas{width:100%!important;height:100%!important;}
+.huarong-piece.piece-5{display:flex;flex-direction:column;}
+.huarong-piece.piece-5 .yearly-controls{margin-bottom:4px;}
+.huarong-piece.piece-5 .panel-info{margin-top:4px;}
+/* 新增 YoY 柱图 + 预测表样式 (Zoom <75% 仍保持可见) */
+#rubbish-yearly-yoy-chart{background:linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0));border-radius:6px;}
+#rubbish-forecast-table{border:1px solid rgba(255,255,255,0.12);padding:6px 8px;border-radius:6px;background:rgba(0,0,0,0.18);backdrop-filter:blur(6px);}
+#rubbish-forecast-table table{width:100%;border-collapse:collapse;}
+#rubbish-forecast-table th,#rubbish-forecast-table td{padding:2px 4px;text-align:right;white-space:nowrap;}
+#rubbish-forecast-table th{color:#8fd1ff;font-weight:500;font-size:11px;}
+#rubbish-forecast-table td{font-size:11px;}
+#rubbish-forecast-table td.negative{color:#ff8b8b;}
+#rubbish-forecast-table td.positive{color:#4fc88d;}
+
+/* 缩放 < 75% (近似宽度变大导致内容压缩) 时补偿：使用媒体查询的最小字体阈值避免断行并允许滚动 */
+@media (max-width:1400px){
+    /* 当用户缩放浏览器页面到较小比例时，DOM 逻辑宽度会接近此范围 */
+    #ext-features-card{overflow:auto;}
+    #ext-features-card .ext-link-tile{min-width:120px;}
+}
+/* 进一步在更窄情况下压缩内边距，防止标题被裁切 */
+@media (max-width:1100px){
+    #ext-features-card{padding:10px 10px 12px 10px !important;}
+    #ext-features-card .ext-link-tile{padding:10px 8px;font-size:11px;}
+    #ext-features-card .panel-title{font-size:0.85rem;line-height:1.2;}
+}
+
+/* 华容道主容器单独 90% */
+.huarong-puzzle-container.panel-grid-8.glass-card {
+    /* 宽度链条: viewport -> 95% (.components-section) -> 100% (.layout-frame) -> 97.5% (此容器)
+       实际占视口 ≈ 0.95 * 0.975 = 92.625% */
+    width:97.5%;
+    max-width:97.5%;
+    margin-left:auto;
+    margin-right:auto;
+}
+
+/* 保留 main-content 全宽流式，内部单块再按上面百分比约束 */
+
+/* 主内容整体上移（原 padding-top:80px -> 48px） */
+.main-content {
+    padding-top:48px !important;
+}
+
+/* ========== 从 education_walkthrough.html 迁移的样式块 ========== */
+/* 迁移时间: 2025-09-30 */
+.bg-video{ position:fixed; inset:0; width:100%; height:100%; object-fit:cover; z-index:-2; opacity:0; transition:opacity 1.2s ease; filter:brightness(0.9) saturate(1.05); }
+.bg-video-ready{ opacity:1; }
+body.no-video .bg-video{ display:none !important; }
+#particle-canvas, .particle-canvas{ position:fixed; inset:0; width:100%; height:100%; z-index:-1; pointer-events:none; }
+header, .frost-header{ position:relative; z-index:10; }
+.bg-overlay{ position:fixed; inset:0; background:rgba(2,8,12,0.42); z-index:-1; pointer-events:none; transition:background .25s ease; }
+main{ position:relative; z-index:5; }
+.step{
+    max-width:1400px;
+    width:calc(100% - 160px);
+    margin:56px auto;
+    padding:28px 56px;
+    border-radius:12px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.01));
+    box-shadow: 0 8px 28px rgba(0,12,24,0.45);
+    transform:translateX(-28px);
+    opacity:0;
+    transition:transform .6s cubic-bezier(.2,.9,.2,1), opacity .5s ease;
+    border:1px solid rgba(255,255,255,0.04);
+    backdrop-filter: blur(6px);
+    min-height:180px;
+}
+@media (max-width: 1000px){ .step{ max-width:94%; width:auto; padding:18px 20px; margin:22px auto; min-height:120px; } }
+.step:nth-child(odd){ transform:translateX(-36px); }
+.step:nth-child(even){ transform:translateX(36px); }
+.step[data-active="true"]{ transform:translateX(0); opacity:1; }
+.step h2{ font-size:30px; margin:0 0 12px 0; color:#eafcff; }
+.step p{ font-size:17px; color: #cfefff; opacity:0.95; line-height:1.8; margin:0; }
+.step h2{ font-size:36px !important; font-weight:700 !important; letter-spacing:0.3px !important; }
+.step h2 span{ font-size:20px !important; opacity:0.95 !important; margin-left:10px !important; }
+.step p{ font-size:18px !important; line-height:1.9 !important; }
+@media (max-width:1000px){ .step h2{ font-size:24px !important; } .step h2 span{ font-size:16px !important; } .step p{ font-size:16px !important; } }
+@media (max-width:1000px){ .step h2{ font-size:20px; } .step p{ font-size:15px; } }
+.step-media{ float:left; width:38%; max-width:460px; margin-right:28px; overflow:hidden; border-radius:10px; }
+.step-media img{ display:block; width:100%; height:220px; object-fit:cover; }
+@media (max-width:1000px){ .step-media{ float:none; width:100%; margin:0 0 12px 0; } .step-media img{ height:160px; width:100%; } }
+.step-media{ display:none !important; }
+.step{ display:flex; align-items:center; }
+.step h2, .step p{ max-width:72%; }
+@media (max-width:1000px){ .step{ display:block; padding:18px 20px; } .step h2, .step p{ max-width:100%; } }
+.step{ position:relative; overflow:hidden; }
+.step-bg{ position:absolute; inset:0; z-index:-2; pointer-events:none; }
+.step-bg img{ position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; }
+@media (max-width:1000px){ .step-bg img{ width:100%; height:auto; max-width:100%; max-height:none; transform:none; left:0; top:0; } }
+#s1, #s2{ background-repeat:no-repeat; background-position:center; }
+.step::before{ content:''; position:absolute; inset:0; background:linear-gradient(180deg, rgba(2,8,12,0.48), rgba(2,8,12,0.48)); z-index:0; pointer-events:none; }
+.step > h2, .step > p{ position:relative; z-index:1; }
+@media (max-width:1000px){ .step{ padding:18px 20px; } .step-bg img{ object-position:center; } }
+.step h2{ font-size:40px !important; }
+.step h2 span{ font-size:22px !important; }
+.step p{ font-size:20px !important; }
+header a{ font-size:15px !important; }
+.jump-menu a{ font-size:13px !important; padding:8px 12px !important; }
+footer{ font-size:14px !important; }
+@media (max-width:1000px){ .step h2{ font-size:26px !important; } .step h2 span{ font-size:18px !important; } .step p{ font-size:17px !important; } }
+
+/* 模拟区样式 */
+#policy-sim{ padding:26px 40px; background:linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.12)); border-radius:12px; margin:36px auto; }
+.sim-grid{ display:flex; gap:20px; align-items:flex-start; }
+.controls{ width:320px; background:rgba(255,255,255,0.02); padding:14px; border-radius:10px; }
+.controls label{ display:block; margin-bottom:10px; font-size:14px; color:#dff7ff; }
+.controls input[type=number], .controls select{ width:100%; padding:6px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06); background:rgba(0,0,0,0.25); color:#eafcff; }
+.controls input[type=range]{ width:100%; }
+.controls .buttons{ display:flex; gap:8px; margin-top:8px; }
+.controls button{ padding:8px 10px; border-radius:8px; background:#0496c7; color:#fff; border:none; cursor:pointer; }
+.chart-wrap{ flex:1; }
+.chart-wrap canvas{ width:100% !important; height:320px !important; border-radius:8px; background:linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.02)); }
+.kpi-row{ display:flex; gap:18px; margin-top:12px; }
+.kpi{ background:rgba(255,255,255,0.03); padding:12px 16px; border-radius:10px; min-width:150px; }
+.kpi-value{ font-size:20px; font-weight:700; color:#eafcff; }
+.kpi-label{ font-size:12px; color:#cfefff; }
+@media (max-width:1000px){ .sim-grid{ display:block; } .controls{ width:100%; } .chart-wrap canvas{ height:260px !important; } }
+
+/* ========== end migrated block ========== */
+
+/* 防止 3D canvas 覆盖按钮：按钮提高 z-index，canvas 降低 pointer-events */
+.globe-controls, .simulation-controls { position:relative; z-index:20; }
+#globe-container canvas { position:relative; z-index:10; }
+#globe-container::after { pointer-events:none; }
+.main-content {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    padding: 80px 20px 40px 20px;
+    width:100%;
+    max-width:none;
+    margin:0 auto;
+    box-sizing:border-box;
+}
+
+/* 区域1: 页面标题 */
+.page-header-section {
+    display: none; /* 隐藏原标题区域 */
+}
+
+.main-title {
+    font-size: 2.5em;
+    color: #40e0ff;
+    margin-bottom: 10px;
+    text-shadow: 0 2px 10px rgba(64, 224, 255, 0.3);
+}
+
+.main-subtitle {
+    font-size: 1.2em;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
+}
+
+/* 区域2: 地球区域保持原样 */
+.globe-section {
+    margin-bottom: 40px;
+}
+
+/* 新增：地球+模拟运行中心左右布局 */
+.two-column-globe {
+    display: flex;
+    flex-direction: row;
+    gap: 28px;
+    padding: 28px 32px 32px 32px;
+    align-items: stretch;
+}
+.two-column-globe .globe-left, 
+.two-column-globe .globe-right {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+.two-column-globe .globe-left { flex: 1 1 60%; min-width: 0; }
+.two-column-globe .globe-right { flex: 1 1 40%; min-width: 300px; }
+
+#globe-container { flex: 1 1 auto; min-height: 420px; }
+.globe-right.simulation-controls { justify-content: flex-start; }
+
+/* 使模拟按钮在右侧列宽内自适应 */
+.two-column-globe .simulation-controls .sim-buttons.unified { width:100%; }
+.two-column-globe .simulation-controls .unified-run-btn { max-width:none; }
+
+/* 响应式：窄屏改为垂直堆叠 */
+@media (max-width: 980px) {
+  .two-column-globe { flex-direction: column; padding:24px 24px 28px 24px; }
+  .two-column-globe .globe-right { min-width: 0; }
+  .two-column-globe .globe-left { min-height: 400px; }
+  #globe-container { min-height: 320px; }
+}
+
+/* 恢复控制条在文档流内，统一底部间距 */
+.two-column-globe .globe-controls {
+    display:flex;
+    flex-wrap:wrap;
+    gap:18px;
+    margin-top:26px;
+    justify-content:flex-start;
+}
+.two-column-globe .globe-right { display:flex; align-items:flex-start; }
+
+.globe-container {
+    padding: 32px;
+    text-align: center;
+}
+
+/* 区域3: 华容道组件区域 */
+.components-section {
+    padding: 28px 20px 36px 20px; /* 上侧减少让整体更靠上 */
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 外框：保证四边严格等距 (使用内层再包一层frame) */
+.layout-frame { 
+    --outer-gap: 32px; /* 可调整体边距 */
+    width:100%; /* 填满 components-section 的 95% */
+    max-width:100%; /* 移除 1500px 限制，保证百分比线性传递 */
+    margin:0 auto;
+    padding: var(--outer-gap) var(--outer-gap) calc(var(--outer-gap) - 4px) var(--outer-gap); /* 底部微调防止光学误差 */
+    box-sizing:border-box;
+    position:relative;
+    display:flex;
+    justify-content:center; /* 居中内部拼图容器 */
+    align-items:stretch;
+}
+
+/* 严格等距：列宽 = (100% - (列数-1)*gap) / 列数 */
+.strict-equal-spacing { 
+    --cols:12;
+    --gap:24px; /* 可调间隙 */
+    --col-width: calc( (100% - (var(--cols) - 1) * var(--gap)) / var(--cols) );
+    display:grid;
+    grid-template-columns: repeat(var(--cols), minmax(0, var(--col-width)));
+    grid-auto-rows: minmax(110px, 11vh);
+    gap: var(--gap);
+    padding:0; /* 已由上层 frame 控制 */
+    background: var(--glass-bg);
+}
+
+/* 调整 piece 大小保持布局逻辑不变 */
+.strict-equal-spacing .piece-1 { grid-column: span 3; }
+.strict-equal-spacing .piece-2 { grid-column: span 4; }
+.strict-equal-spacing .piece-3 { grid-column: span 4; }
+.strict-equal-spacing .piece-4 { grid-column: span 3; }
+.strict-equal-spacing .piece-5 { grid-column: span 3; }
+.strict-equal-spacing .piece-6 { grid-column: span 4; }
+.strict-equal-spacing .piece-7 { grid-column: span 4; }
+.strict-equal-spacing .piece-8 { grid-column: span 4; }
+
+@media (max-width:1200px){
+    .strict-equal-spacing { --cols:8; --gap:22px; --col-width: calc( (100% - (var(--cols) - 1) * var(--gap)) / var(--cols) ); }
+    .strict-equal-spacing .piece-1 { grid-column: span 4; }
+    .strict-equal-spacing .piece-2 { grid-column: span 8; }
+    .strict-equal-spacing .piece-3 { grid-column: span 8; }
+    .strict-equal-spacing .piece-4,
+    .strict-equal-spacing .piece-5,
+    .strict-equal-spacing .piece-6,
+    .strict-equal-spacing .piece-7,
+    .strict-equal-spacing .piece-8 { grid-column: span 4; }
+}
+@media (max-width:760px){
+    .layout-frame { --outer-gap:18px; }
+    .strict-equal-spacing { --cols:4; --gap:16px; --col-width: calc( (100% - (var(--cols) - 1) * var(--gap)) / var(--cols) ); grid-auto-rows:minmax(140px, 18vh); }
+    .strict-equal-spacing .huarong-piece { min-height:140px; }
+    .strict-equal-spacing .piece-1,
+    .strict-equal-spacing .piece-2,
+    .strict-equal-spacing .piece-3,
+    .strict-equal-spacing .piece-4,
+    .strict-equal-spacing .piece-5,
+    .strict-equal-spacing .piece-6,
+    .strict-equal-spacing .piece-7,
+    .strict-equal-spacing .piece-8 { grid-column: span 4; }
+}
+.ocean-pollution-card{display:flex;flex-direction:column;gap:8px;height:100%;}
+.ocean-pollution-main{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;background:linear-gradient(140deg,rgba(64,224,255,0.18),rgba(0,119,255,0.12));border:1px solid rgba(255,255,255,0.22);border-radius:var(--radius-medium);padding:10px 6px;}
+.ocean-pollution-main .main-value{font-size:clamp(1.9rem,3.3vw,2.7rem);font-weight:700;letter-spacing:1px;color:#8be9ff;text-shadow:0 0 6px rgba(139,233,255,.4);} 
+.ocean-pollution-main .main-label{font-size:.72rem;opacity:.85;margin-top:4px;letter-spacing:.5px;}
+.ocean-pollution-sub{display:flex;gap:8px;}
+.ocean-pollution-sub .sub-box{flex:1;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.18);border-radius:var(--radius-small);padding:8px 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.ocean-pollution-sub .sub-value{font-size:.9rem;font-weight:600;color:#40e0ff;}
+.ocean-pollution-sub .sub-label{font-size:.62rem;opacity:.75;margin-top:2px;letter-spacing:.5px;}
+
+/* 统一拼图容器：采用 CSS 变量控制统一间距 */
+/* 统一：使用容器宽度百分比控制内边距与间距，保持首行与末行视觉等距 */
+:root { --puzzle-gap: 1.2%; --puzzle-padding: 2.4%; }
+.huarong-puzzle-container {
+    position: relative;
+    width: 100%;
+    max-width: 100%; /* 跟随父级 95vw */
+    min-width: 320px;
+    margin: 0 auto;
+    padding: var(--puzzle-padding);
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-auto-rows: minmax(110px, 11vh);
+    grid-auto-flow: dense;
+    gap: var(--puzzle-gap);
+    align-items: stretch;
+    justify-items: stretch;
+}
+
+/* 华容道拼图块基础样式 */
+.huarong-piece {
+    position: relative; /* 改为相对布局，由 grid 控制位置 */
+    background: var(--glass-bg);
+    backdrop-filter: var(--backdrop-filter);
+    -webkit-backdrop-filter: var(--backdrop-filter);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-global);
+    padding: 14px;
+    color: var(--text-primary);
+    transition: box-shadow .3s, transform .3s;
+    overflow: hidden; /* 防止内容溢出边界 */
+    cursor: default;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    min-height: 120px;
+    box-shadow: 0 6px 24px var(--glass-shadow), inset 0 1px 0 rgba(255,255,255,.15);
+}
+
+.huarong-piece::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+}
+
+.huarong-piece:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+        0 12px 40px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* 确保组件内容完整显示 */
+.huarong-piece .panel-title {
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+    flex-shrink: 0;
+    line-height: 1.2;
+}
+
+.huarong-piece .panel-content {
+    flex: 1;
+    overflow: visible !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    min-height: 0;
+}
+
+/* 增强海洋污染和其他重要组件的内容适配 */
+.huarong-piece .enhanced-ocean-stats,
+.huarong-piece .compact-mini-stats,
+.huarong-piece .large-stats-grid {
+    height: auto;
+    overflow: visible !important;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* 组件内画布适配 */
+.huarong-piece canvas {
+    max-width: 95%;
+    max-height: 75%;
+}
+
+/* 扩展：大型模拟面板（环流概览、生物减少、水质影响）放大占比 */
+.piece-8, .piece-9, .piece-10 { display:flex; flex-direction:column; }
+/* 放大底部三块模拟图表：设置最小/最大高度，避免被全局 140px 限制压缩 */
+.piece-8 canvas#ocean-overview-chart,
+.piece-9 canvas#marine-bio-loss-chart,
+.piece-10 canvas#water-quality-chart {
+    flex:1 1 auto;
+    width:100% !important;
+    height:100% !important;
+    max-height:420px !important; /* 放大上限，给生物减少图更多纵向空间 */
+    min-height:200px !important;
+    align-self:center;
+}
+
+/* 单独为生物减少图添加调试辅助（可后续移除） */
+.piece-9 canvas#marine-bio-loss-chart {
+    outline:1px dashed rgba(64,224,255,0.35);
+}
+.piece-8 .panel-info, .piece-9 .panel-info, .piece-10 .panel-info { margin-top:8px; }
+
+/* ===== 新版 8 组件等距排布系统 =====
+     目标：所有组件对外框四边、彼此之间保持完全统一的水平/垂直距离；随屏幕宽度自适应；不再依赖历史 piece-x 行列硬编码混合逻辑。
+     实现策略：
+     1. 外层容器使用统一 padding = gap，保证外边距与内部间距数值一致 (视觉“框线等距”)。
+     2. 定义 .panel-grid-8 -> 桌面端 12 列，行高由内容自动 + 最小高度；通过尺寸类别 class 控制不同占位。
+     3. 每个组件只放置一个尺寸类：u-s (small)、u-m (medium)、u-l (large)；组合规则遵循 12 列装箱。
+     4. 移除旧 piece-x span 规则对齐，避免后续维护困难；piece-x 仅保留语义或 JS 钩子，不再负责尺寸。
+     5. 使用 dense + auto-flow 减少空洞，同时通过有计划的列宽方案确保首尾对齐。
+*/
+
+/* 外层：重设 huarong-puzzle-container 为统一模式 */
+/* 精确 8 宫格：显式行列 + 区域，彻底消除 dense 带来的不整齐 */
+ .huarong-puzzle-container.panel-grid-8 {
+    --grid-gap: 26px;
+    --outer-pad: var(--grid-gap);
+    padding: var(--outer-pad);
+    display: grid;
+    box-sizing: border-box;
+    gap: var(--grid-gap);
+    background: var(--glass-bg);
+    grid-template-columns: repeat(12, 1fr);
+    /* 行高度收紧：150 -> 138，减少整体垂直空间 */
+    grid-template-rows: repeat(6, minmax(138px, auto));
+     /* 添加新区域 I/J: 生物减少模拟 + 水质影响模拟（底部两行拆分为 H/I/J 三块）
+         Row1: A A A A A A B B B C C C
+         Row2: A A A A A A B B B C C C
+         Row3: D D D E E E F F F F G G
+         Row4: D D D E E E F F F F G G
+         Row5: H H H H H H I I I I I I
+         Row6: H H H H H H J J J J J J */
+     grid-template-areas:
+        "A A A A A A B B B C C C"
+        "A A A A A A B B B C C C"
+        "D D D E E E F F F F G G"
+        "D D D E E E F F F F G G"
+        "H H H H H H I I I I I I"
+        "H H H H H H J J J J J J";
+}
+
+/* 尺寸分类：只用列跨度；行高度由内容撑开（可选再加 u-tall-* 细分） */
+/* 尺寸类保留（在精确区域模式下仅作语义，不再改变列宽） */
+.huarong-puzzle-container.panel-grid-8 .u-s { min-height:160px; }
+.huarong-puzzle-container.panel-grid-8 .u-m { min-height:200px; }
+.huarong-puzzle-container.panel-grid-8 .u-l { min-height:240px; }
+
+/* 可选：大显示器时提升紧凑感 */
+@media (min-width:1600px){
+    .huarong-puzzle-container.panel-grid-8 { --grid-gap: 28px; }
+}
+@media (max-width:1200px){
+    /* 中屏：改为 8 列重新定义区域 (压缩纵向) */
+    .huarong-puzzle-container.panel-grid-8 {
+        grid-template-columns: repeat(8, 1fr);
+        grid-template-rows: repeat(8, minmax(150px, auto));
+        grid-template-areas:
+            "A A A A A A B B"
+            "A A A A A A C C"
+            "D D D E E E F F"
+            "D D D E E E F F"
+            "G G H H H H H H"
+            "G G H H H H H H"
+            "G G H H H H H H"
+            "G G H H H H H H";
+    }
+}
+@media (max-width:760px){
+    .huarong-puzzle-container.panel-grid-8 {
+        grid-template-columns: repeat(4,1fr);
+        --grid-gap:18px;
+        grid-template-rows: repeat(16, minmax(140px, auto));
+        grid-template-areas:
+            "A A A A"
+            "A A A A"
+            "A A A A"
+            "A A A A"
+            "B B C C"
+            "B B C C"
+            "D D E E"
+            "D D E E"
+            "F F F F"
+            "F F F F"
+            "G G G G"
+            "G G G G"
+            "H H H H"
+            "H H H H"
+            "H H H H"
+            "H H H H";
+    }
+}
+
+/* 将现有 8 组件映射到新尺寸分类：
+     piece-1: u-s (信息简洁)
+     piece-2: u-m (来源统计)
+     piece-3: u-l (生态影响大块)
+     piece-4: u-s (趋势)
+     piece-5: u-m (年度垃圾)
+     piece-6: u-m (城市分布)
+     piece-7: u-m (河流排放)
+     piece-8: u-m (环流概览)
+     布局打包示例 (12列)：
+         Row1: u-l(6) + u-m(4) + u-s(3) -> 6+4+3 超 12，需排序策略。
+     实际采用顺序 + dense：
+         建议顺序: piece-3(u-l=6) | piece-2(u-m=4) | piece-1(u-s=3) 会产生换行 -> 6+4=10 剩2 -> 下行放 piece-1。
+     为获得整齐行：自定义顺序（通过 DOM 重新排序或 flex-order）。为避免改 HTML，这里提供 order 辅助。*/
+
+/* 区域映射：直接用 grid-area 精确定位 */
+.panel-grid-8 .piece-3 { grid-area:A; }
+.panel-grid-8 .piece-2 { grid-area:B; }
+.panel-grid-8 .piece-1 { grid-area:C; }
+.panel-grid-8 .piece-4 { grid-area:D; }
+.panel-grid-8 .piece-5 { grid-area:E; }
+.panel-grid-8 .piece-6 { grid-area:H; }
+.panel-grid-8 .piece-7 { grid-area:G; }
+.panel-grid-8 .piece-8 { grid-area:F; }
+.panel-grid-8 .piece-9 { grid-area:I; }
+.panel-grid-8 .piece-10 { grid-area:J; }
+
+/* 旧局部高度限制保留但调小，避免撑出不必要空白 */
+#density-chart, #species-impact-chart { max-height: 170px; }
+.large-stats-grid { flex:0 0 auto; }
+
+/* Tag 尺寸类（不直接改 HTML 时以 :not 已有类时 js 注入）此处暂内联演示： */
+/* 组件自定义附加视觉（去除空规则避免 lint 警告） */
+.piece-3 { background:linear-gradient(135deg,rgba(64,224,255,0.15) 0%, rgba(106,17,203,0.15) 100%); border:1px solid rgba(64,224,255,0.3); padding:12px 14px !important; }
+.piece-3 .large-stats-grid { gap:6px; margin-bottom:4px; }
+.piece-3 #density-chart { margin-top:4px !important; }
+.piece-3 #species-impact-chart { margin-top:2px !important; }
+.piece-3 .large-stat-item { padding:8px 6px; }
+
+/* 尺寸工具类占位：保持可选择钩子并避免空规则 (使用无影响的 custom property) */
+.u-s { --u-size: s; }
+.u-m { --u-size: m; }
+.u-l { --u-size: l; }
+
+/* 视口宽度不足时自动重排 */
+@media (max-width: 1100px) {
+    .huarong-puzzle-container { grid-template-columns: repeat(8, 1fr); }
+    .piece-1 { grid-column: span 4; }
+    .piece-2 { grid-column: span 8; }
+    .piece-3 { grid-column: span 8; }
+    .piece-4, .piece-5, .piece-6, .piece-7, .piece-8 { grid-column: span 4; }
+    :root { --puzzle-gap: 1.6%; --puzzle-padding: 3%; }
+}
+@media (max-width: 720px) {
+    .huarong-puzzle-container { grid-template-columns: repeat(4, 1fr); grid-auto-rows: minmax(140px, 18vh); }
+    .huarong-piece { min-height: 140px; }
+    .piece-1, .piece-4, .piece-5 { grid-column: span 4; }
+    .piece-2, .piece-3, .piece-6, .piece-7, .piece-8 { grid-column: span 4; }
+    :root { --puzzle-gap: 2.5%; --puzzle-padding: 4%; }
+}
+
+/* 海洋污染统计内部内容自适应，避免裁切 */
+.piece-1 .enhanced-ocean-stats { 
+    display:flex; 
+    flex-direction:column; 
+    gap:6px; 
+    flex:1; 
+    justify-content:flex-start; 
+}
+.piece-1 .main-pollution-stat { 
+    background:linear-gradient(135deg, rgba(64,224,255,0.15), rgba(32,122,255,0.15)); 
+    border:1px solid rgba(255,255,255,0.2); 
+    border-radius: var(--radius-medium); 
+    padding:10px 8px; 
+    text-align:center; 
+}
+.piece-1 .pollution-number { font-size: clamp(1.8rem, 3.2vw, 2.6rem); font-weight:700; letter-spacing:1px; }
+.piece-1 .pollution-unit { font-size: .85rem; opacity:.85; margin-top:2px; }
+.piece-1 .pollution-details { 
+    display:flex; 
+    gap:8px; 
+    justify-content:space-between; 
+    margin-top:4px; 
+}
+.piece-1 .detail-item { 
+    flex:1; 
+    background:rgba(255,255,255,0.06); 
+    border:1px solid rgba(255,255,255,0.15); 
+    padding:6px 4px; 
+    border-radius: var(--radius-small); 
+    text-align:center; 
+    display:flex; 
+    flex-direction:column; 
+    gap:2px; 
+}
+.piece-1 .detail-number { font-size:.85rem; font-weight:600; color:#40e0ff; }
+.piece-1 .detail-text { font-size:.65rem; opacity:.75; }
+
+/* 区域4: 关键概念 */
+.concepts-section {
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-medium);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 区域5: 页脚保持原样 */
+.footer {
+    margin-top: 20px;
+}
+
+/* ===== 顶部精简控制栏（替代 3D 地球区） ===== */
+.top-controls-bar {
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:18px;
+        padding:14px 20px;
+                margin:0 auto 20px auto;
+        background:var(--glass-bg);
+        border:1px solid var(--glass-border);
+        border-radius:20px;
+        backdrop-filter: var(--backdrop-filter);
+}
+.top-controls-bar.compact-bar { max-width:1080px; width:92%; }
+.top-controls-bar.compact-bar .tc-left button { min-width:190px; }
+.top-controls-bar.compact-bar .unified-run-btn { background:linear-gradient(135deg,#444,#333); border:1px solid rgba(255,255,255,0.18); }
+.top-controls-bar.compact-bar .unified-run-btn:hover { background:linear-gradient(135deg,#575757,#3f3f3f); }
+.top-controls-bar.compact-bar .demo-btn { min-width:260px; }
+.top-controls-bar .tc-right { padding-right:4px; }
+@media (max-width:900px){
+    .top-controls-bar.compact-bar { width:95%; max-width:760px; }
+    .top-controls-bar.compact-bar .tc-left button { flex:1 1 auto; min-width:140px; }
+    .top-controls-bar.compact-bar .demo-btn { min-width:unset; }
+}
+@media (max-width:560px){
+    .top-controls-bar.compact-bar { flex-direction:column; align-items:stretch; }
+    .top-controls-bar.compact-bar .tc-left { width:100%; }
+    .top-controls-bar.compact-bar .tc-right { align-self:flex-end; }
+}
+.top-controls-bar .tc-left { display:flex; gap:14px; flex-wrap:wrap; }
+.top-controls-bar .tc-right { font-size:.8rem; color:#a8dadc; letter-spacing:1px; }
+@media (max-width:780px){
+    .top-controls-bar { flex-direction:column; align-items:stretch; }
+    .top-controls-bar .tc-left { width:100%; }
+    .top-controls-bar .tc-right { align-self:flex-end; }
+}
+@media (max-width:520px){
+    .top-controls-bar .unified-run-btn { flex:1 1 100%; }
+    .top-controls-bar .demo-btn { flex:1 1 100%; }
+}
+
+
+/* 悬停效果 - 移除位移动画 */
+.huarong-piece:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* 粒子背景画布 */
+#particle-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* CSS变量 - 液态玻璃风格 */
+:root {
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --glass-shadow: rgba(0, 0, 0, 0.1);
+    --accent-blue: rgba(77, 171, 247, 0.8);
+    --accent-cyan: rgba(34, 197, 194, 0.8);
+    --text-primary: rgba(255, 255, 255, 0.95);
+    --text-secondary: rgba(255, 255, 255, 0.7);
+    --backdrop-filter: blur(20px) saturate(180%);
+}
+
+/* 主容器 */
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+/* 头部样式 */
+.header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 40px 20px;
+}
+
+.title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    background: linear-gradient(135deg, #fff, #a8dadc);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 12px;
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    font-weight: 300;
+    color: #a8dadc;
+    letter-spacing: 2px;
+}
+
+/* 面板基础样式 */
+.panel {
+    background: var(--glass-bg);
+    backdrop-filter: var(--backdrop-filter);
+    -webkit-backdrop-filter: var(--backdrop-filter);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-global);
+    padding: 32px;
+    margin: 16px 0; /* 收紧垂直间距，避免 95vw 之后出现视觉断层 */
+    box-shadow: 
+        0 8px 32px var(--glass-shadow),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.panel:hover {
+    transform: translateY(-5px);
+    box-shadow: 
+        0 16px 48px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+    transition: left 0.5s;
+}
+
+.panel:hover::before {
+    left: 100%;
+}
+
+.panel-title {
+    font-size: 1.3rem;
+    font-weight: 500;
+    color: #a8dadc;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* 3D地球区域 */
+.globe-section {
+    margin-bottom: 40px;
+    position: relative;
+    z-index: 10;
+}
+
+.globe-container {
+    position: relative;
+    z-index: 11;
+}
+
+.globe-panel {
+    text-align: center;
+}
+
+#globe-container {
+    width: 100%;
+    height: 400px;
+    border-radius: var(--radius-medium);
+    overflow: hidden;
+    position: relative;
+    z-index: 12;
+    background: radial-gradient(ellipse at center, rgba(15, 76, 117, 0.3) 0%, rgba(10, 26, 46, 0.8) 100%);
+    margin-bottom: 20px;
+}
+
+.globe-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.size-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--glass-bg);
+    backdrop-filter: var(--backdrop-filter);
+    -webkit-backdrop-filter: var(--backdrop-filter);
+    border: 1px solid var(--glass-border);
+    border-radius: 50px;
+    padding: 8px 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.size-control span {
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    font-weight: 500;
+    opacity: 0.8;
+}
+
+.size-btn {
+    background: var(--glass-bg) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-global) !important;
+    color: var(--text-primary);
+    padding: 8px 16px !important;
+    font-size: 0.8rem !important;
+    cursor: pointer;
+    transition: all 0.2s ease !important;
+    min-width: 50px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.size-btn:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.size-btn.active {
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan)) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    color: white !important;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(77, 171, 247, 0.3);
+    transform: scale(1.05);
+}
+
+.toggle-btn {
+    background: linear-gradient(135deg, rgba(77, 171, 247, 0.3), rgba(34, 197, 194, 0.3)) !important;
+    border-color: var(--accent-blue) !important;
+}
+
+.view-btn {
+    background: var(--glass-bg) !important;
+    border-color: var(--glass-border) !important;
+}
+
+.demo-btn {
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan)) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    color: white !important;
+    font-weight: 600 !important;
+    box-shadow: 0 8px 24px rgba(77, 171, 247, 0.4);
+}
+
+.control-btn {
+    background: var(--glass-bg);
+    backdrop-filter: var(--backdrop-filter);
+    -webkit-backdrop-filter: var(--backdrop-filter);
+    border: 1px solid var(--glass-border);
+    border-radius: 50px; /* 维持圆形/胶囊特殊外观 */
+    color: var(--text-primary);
+    padding: 12px 24px;
+    font-family: 'Inter', 'Roboto', sans-serif;
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.control-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.control-btn:hover::before {
+    left: 100%;
+}
+
+.control-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.control-btn:hover::before {
+    left: 100%;
+}
+
+.control-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.control-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* 地球大小控制 */
+.size-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    padding: 10px 18px;
+    border-radius: var(--radius-global);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.control-label {
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-right: 8px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.size-btn {
+    padding: 6px 14px !important;
+    font-size: 0.8rem !important;
+    min-width: 50px;
+    background: rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(8px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: var(--radius-global) !important;
+    color: var(--text-primary) !important;
+    font-weight: 500 !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.size-btn:hover {
+    background: rgba(168, 218, 220, 0.2) !important;
+    transform: scale(1.02) !important;
+}
+
+.size-btn.active {
+    background: linear-gradient(145deg, #457b9d, #1d3557) !important;
+    border-color: #a8dadc !important;
+    box-shadow: 0 2px 8px rgba(168, 218, 220, 0.3);
+}
+
+/* 华容道式网格布局 */
+.huarong-grid-section {
+    margin: 40px 0;
+    padding: 0;
+}
+
+.grid-title {
+    text-align: center;
+    color: var(--text-primary);
+    font-size: 2.2rem;
+    font-weight: 500;
+    margin-bottom: 10px;
+    background: linear-gradient(135deg, #22c5c2, #4dabf7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.grid-subtitle {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+    opacity: 0.9;
+}
+
+/* 华容道网格 - 4x2布局 */
+.huarong-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 15px;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* 华容道网格项目基础样式 */
+.grid-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    padding: 15px;
+}
+
+
+
+.grid-item:hover {
+    transform: translateY(-5px) scale(1.02);
+    z-index: 10;
+    box-shadow: 0 15px 35px rgba(34, 197, 194, 0.3);
+}
+
+/* 网格项目动画 */
+.grid-item:nth-child(1) { animation: slideInLeft 0.6s ease 0.1s forwards; opacity: 0; }
+.grid-item:nth-child(2) { animation: slideInDown 0.6s ease 0.2s forwards; opacity: 0; }
+.grid-item:nth-child(3) { animation: slideInDown 0.6s ease 0.3s forwards; opacity: 0; }
+.grid-item:nth-child(4) { animation: slideInRight 0.6s ease 0.4s forwards; opacity: 0; }
+.grid-item:nth-child(5) { animation: slideInLeft 0.6s ease 0.5s forwards; opacity: 0; }
+.grid-item:nth-child(6) { animation: slideInUp 0.6s ease 0.6s forwards; opacity: 0; }
+.grid-item:nth-child(7) { animation: slideInUp 0.6s ease 0.7s forwards; opacity: 0; }
+.grid-item:nth-child(8) { animation: slideInRight 0.6s ease 0.8s forwards; opacity: 0; }
+
+/* 大组件统计数据样式 */
+.large-stats-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+.large-stat-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.large-stat-item {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-small);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.large-stat-number {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #40E0FF;
+    margin-bottom: 3px;
+    line-height: 1.1;
+}
+
+.large-stat-label {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.0;
+}
+
+/* 生态影响统计组件的密度图表 */
+.piece-3 #density-chart {
+    width: 100% !important;
+    height: 160px !important;
+    max-height: 160px !important;
+    margin-top: 10px !important;
+}
+
+/* piece-2 内容适配 - 生态影响统计大块特殊处理 */
+.piece-2 {
+    padding: 25px !important;
+}
+
+.piece-2 .large-stats-grid {
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
+.piece-2 canvas {
+    height: 120px !important;
+    margin-top: 10px !important;
+    display: none; /* 默认隐藏 */
+}
+
+.piece-2.clicked canvas {
+    display: block; /* 点击后显示 */
+}
+
+/* 生态影响统计组件整体布局 */
+.piece-3 {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 15px !important;
+}
+
+.piece-3 .panel-title {
+    flex-shrink: 0;
+    margin-bottom: 8px !important;
+    font-size: 1.1rem !important;
+}
+
+.piece-3 .large-stats-grid {
+    flex-shrink: 0;
+    margin-bottom: 8px;
+}
+
+/* 历史趋势组件特殊适配 */
+.piece-4 {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.piece-4 .panel-title {
+    margin-bottom: 10px;
+    flex-shrink: 0;
+}
+
+.piece-4 #trend-chart {
+    flex: 1;
+    width: 100% !important;
+    height: calc(100% - 50px) !important;
+    max-height: 150px !important;
+    min-height: 120px !important;
+}
+
+/* 城市垃圾分布组件(piece-8)特殊适配 */
+.piece-8 {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.piece-8 .panel-title {
+    flex-shrink: 0;
+    margin-bottom: 8px;
+}
+
+.piece-8 #rubbish-city-chart {
+    flex: 1;
+    width: 100% !important;
+    height: calc(100% - 80px) !important;
+    max-height: 120px !important;
+    min-height: 100px !important;
+}
+
+.piece-8 .sim-btn {
+    flex-shrink: 0;
+    margin-top: 8px;
+    height: 30px;
+    font-size: 0.8rem;
+}
+
+/* 迷你统计样式（小组件用） */
+.compact-mini-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+.mini-stat {
+    text-align: center;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-small);
+}
+
+.mini-number {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #40E0FF;
+    margin-bottom: 2px;
+}
+
+.mini-label {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* 增强的海洋污染显示组件 */
+.enhanced-ocean-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    padding: 8px;
+}
+
+.main-pollution-stat {
+    text-align: center;
+    background: linear-gradient(135deg, rgba(64, 224, 255, 0.15) 0%, rgba(34, 197, 194, 0.15) 100%);
+    padding: 16px;
+    border-radius: var(--radius-small);
+    border: 1px solid rgba(64, 224, 255, 0.3);
+    box-shadow: 0 4px 16px rgba(64, 224, 255, 0.1);
+}
+
+.pollution-number {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #40E0FF;
+    text-shadow: 0 2px 8px rgba(64, 224, 255, 0.3);
+    margin-bottom: 4px;
+    background: linear-gradient(45deg, #40E0FF, #22C5C2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.pollution-unit {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 500;
+}
+
+.pollution-details {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-small);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.detail-number {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #22C5C2;
+}
+
+.detail-text {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* 模拟按钮样式 */
+.sim-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: var(--radius-medium);
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    margin: 5px 0;
+    display: block;
+    width: 100%;
+}
+
+.sim-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    background: linear-gradient(135deg, #5a67d8 0%, #6b5b95 100%);
+}
+
+.sim-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+}
+
+/* 华容道网格图表样式 */
+.grid-item canvas {
+    width: 100% !important;
+    border-radius: 8px;
+    margin-top: 8px;
+}
+
+/* 华容道网格项基础样式 */
+.grid-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    padding: 15px;
+}
+
+.grid-item:hover {
+    transform: translateY(-3px);
+    z-index: 10;
+    box-shadow: 0 15px 35px rgba(34, 197, 194, 0.3);
+}
+
+/* 不同尺寸组件的图表样式 */
+/* 小方块图表 - 第1,3,7个位置 */
+.grid-item:nth-child(1) canvas,
+.grid-item:nth-child(3) canvas,
+.grid-item:nth-child(7) canvas {
+    height: 80px !important;
+}
+
+/* 横长方块图表 - 第2,8个位置 */
+.grid-item:nth-child(2) canvas,
+.grid-item:nth-child(8) canvas {
+    height: 100px !important;
+}
+
+/* 竖长方块图表 - 第5,6个位置 */
+.grid-item:nth-child(5) canvas,
+.grid-item:nth-child(6) canvas {
+    height: 150px !important;
+}
+
+/* 大方块图表 - 第4个位置（生态影响统计） */
+.grid-item:nth-child(4) canvas {
+    height: 150px !important;
+}
+
+/* 控制面板特殊样式 - 第9个位置 */
+.grid-item:nth-child(9) {
+    justify-content: space-around;
+}
+
+.grid-item h3 {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1rem;
+    margin-bottom: 10px;
+    text-align: center;
+    font-weight: 500;
+}
+
+/* 模拟按钮样式 */
+.grid-item button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    margin-top: 10px;
+}
+
+.grid-item button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    background: linear-gradient(135deg, #5a67d8 0%, #6b5b95 100%);
+}
+
+.grid-item button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+}
+
+/* 紧凑的统计网格 */
+.compact-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    height: 100%;
+}
+
+.compact-stats .stat-item {
+    padding: 15px 10px;
+    text-align: center;
+}
+
+.compact-stats .stat-number {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.compact-stats .stat-label {
+    font-size: 0.8rem;
+    opacity: 0.9;
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+    .huarong-puzzle-grid {
+        max-width: 800px;
+        height: 600px;
+    }
+}
+
+@media (max-width: 768px) {
+    .huarong-puzzle-grid {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(5, 1fr);
+        gap: 10px;
+        padding: 15px;
+        height: 800px;
+        max-width: 500px;
+    }
+    
+    /* 移动端重新定位 */
+    .grid-item:nth-child(1) { grid-column: 1; grid-row: 1; }
+    .grid-item:nth-child(2) { grid-column: 2; grid-row: 1; }
+    .grid-item:nth-child(3) { grid-column: 1; grid-row: 2; }
+    .grid-item:nth-child(4) { grid-column: 1 / 3; grid-row: 3; }
+    .grid-item:nth-child(5) { grid-column: 2; grid-row: 2; }
+    .grid-item:nth-child(6) { grid-column: 1; grid-row: 4; }
+    .grid-item:nth-child(7) { grid-column: 2; grid-row: 4; }
+    .grid-item:nth-child(8) { grid-column: 1 / 3; grid-row: 5; }
+    .grid-item:nth-child(9) { grid-column: 1 / 3; grid-row: 6; }
+    
+    .large-stat-row {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .large-stat-number {
+        font-size: 1.2rem;
+    }
+    
+    .large-stat-label {
+        font-size: 0.7rem;
+    }
+    
+    .sim-btn {
+        padding: 8px 12px;
+        font-size: 0.75rem;
+    }
+    
+    .grid-item canvas {
+        height: 100px !important;
+    }
+}
+
+/* 动画定义 */
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 图表面板 - 确保内容不超出 */
+.chart-panel {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.chart-panel canvas {
+    width: 100% !important;
+    height: calc(100% - 40px) !important;
+    max-height: 170px !important; /* 默认略放大 */
+    max-width: 100% !important;
+    border-radius: 10px;
+    box-sizing: border-box;
+}
+/* 针对来源统计与附属物种影响图高度调整 */
+canvas#source-chart { max-height:220px !important; }
+canvas#density-chart { height:180px !important; max-height:180px !important; }
+canvas#species-impact-chart { height:140px !important; max-height:140px !important; }
+/* 底部大面板进一步放大 */
+/* piece-8 已缩小到中等区域 -> 降低高度；piece-6 现在占用大区域 */
+.piece-8 canvas#ocean-overview-chart { max-height:180px !important; }
+.piece-6 #rubbish-city-chart { max-height:300px !important; }
+.piece-9 canvas#marine-bio-loss-chart { max-height:320px !important; }
+.piece-10 canvas#water-quality-chart { max-height:320px !important; }
+/* 生态影响面板底部空白压缩 */
+.piece-3 { padding-bottom:12px !important; }
+
+.panel-info {
+    text-align: center;
+    margin-top: 15px;
+}
+
+.info-text {
+    color: #a8dadc;
+    font-size: 0.9rem;
+    font-weight: 300;
+}
+
+/* 统计面板 */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 15px;
+    background: rgba(168, 218, 220, 0.1);
+    border-radius: 15px;
+    border: 1px solid rgba(168, 218, 220, 0.2);
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #a8dadc;
+    font-weight: 300;
+}
+
+/* 信息区域 */
+.info-section {
+    margin-bottom: 40px;
+}
+
+.concept-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+}
+
+.concept-link {
+    color: var(--text-primary);
+    text-decoration: none;
+    padding: 10px 18px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 25px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 500;
+    font-size: 0.9rem;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.concept-link:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* 底部 */
+.footer {
+    text-align: center;
+    padding: 40px 20px;
+    border-top: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    backdrop-filter: var(--backdrop-filter);
+    -webkit-backdrop-filter: var(--backdrop-filter);
+    margin-top: 40px;
+    border-radius: 24px 24px 0 0;
+}
+
+.footer-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.footer-text {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 400;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.demo-btn {
+    background: linear-gradient(145deg, #0f4c75, #16213e);
+    border: 2px solid #a8dadc;
+    border-radius: 30px;
+    color: #ffffff;
+    padding: 15px 35px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.demo-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 25px rgba(168, 218, 220, 0.3);
+    background: linear-gradient(145deg, #16213e, #0f4c75);
+}
+
+.btn-arrow {
+    transition: transform 0.3s ease;
+}
+
+.demo-btn:hover .btn-arrow {
+    transform: translateX(5px);
+}
+
+/* 模拟按钮特殊样式 */
+.simulation-btn {
+    background: linear-gradient(145deg, #0f7b0f, #16213e) !important;
+    border-color: #90ee90 !important;
+    font-weight: 600;
+    animation: simulationPulse 2s infinite;
+}
+
+.simulation-btn:hover {
+    background: linear-gradient(145deg, #16213e, #0f7b0f) !important;
+    box-shadow: 0 5px 20px rgba(144, 238, 144, 0.4) !important;
+}
+
+@keyframes simulationPulse {
+    0%, 100% { 
+        box-shadow: 0 0 10px rgba(144, 238, 144, 0.3); 
+    }
+    50% { 
+        box-shadow: 0 0 20px rgba(144, 238, 144, 0.6); 
+    }
+}
+
+/* 动画效果 */
+@keyframes panelPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+.panel-animate {
+    animation: panelPulse 0.3s ease;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .title {
+        font-size: 2rem;
+    }
+    
+    .data-panels {
+        grid-template-columns: 1fr;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .concept-links {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .footer-content {
+        flex-direction: column;
+    }
+    
+    .globe-controls {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 15px;
+    }
+    
+    .panel {
+        padding: 20px;
+        margin: 15px 0;
+    }
+    
+    #globe-container {
+        height: 300px;
+    }
+}
+
+/* 加载动画 */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.panel {
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+.panel:nth-child(1) { animation-delay: 0.1s; }
+.panel:nth-child(2) { animation-delay: 0.2s; }
+.panel:nth-child(3) { animation-delay: 0.3s; }
+.panel:nth-child(4) { animation-delay: 0.4s; }
+
+/* 数据模拟控制区域样式 */
+.simulation-controls {
+    margin: 25px 0;
+    padding: 24px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    backdrop-filter: var(--backdrop-filter);
+    -webkit-backdrop-filter: var(--backdrop-filter);
+    text-align: center;
+    box-shadow: 0 8px 32px var(--glass-shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+.simulation-controls::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+}
+
+.simulation-title {
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 15px;
+    opacity: 0.9;
+}
+
+.simulation-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.simulation-controls .simulation-btn {
+    padding: 12px 20px;
+    font-size: 0.9rem;
+    background: linear-gradient(135deg, rgba(34, 197, 194, 0.8) 0%, rgba(77, 171, 247, 0.8) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    color: #ffffff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    font-weight: 500;
+}
+
+.simulation-controls .simulation-btn:hover {
+    background: linear-gradient(135deg, rgba(34, 197, 194, 1) 0%, rgba(77, 171, 247, 1) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(34, 197, 194, 0.3);
+}
+
+.simulation-controls .simulation-btn:active {
+    transform: translateY(0);
+    transition: all 0.1s ease;
+}
+
+.simulation-status {
+    padding: 8px 15px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.status-text {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    font-style: italic;
+}
+
+.status-running {
+    color: #22c5c2;
+    animation: pulse 2s infinite;
+}
+
+.status-success {
+    color: #4ade80;
+}
+
+.status-error {
+    color: #f87171;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+/* 模拟图表区域样式 */
+.simulation-charts-section {
+    margin: 40px 0;
+    padding: 0;
+}
+
+.simulation-section-title {
+    text-align: center;
+    color: var(--text-primary);
+    font-size: 1.8rem;
+    font-weight: 500;
+    margin-bottom: 30px;
+    background: linear-gradient(135deg, #22c5c2, #4dabf7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.simulation-charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.simulation-chart-panel {
+    min-height: 350px;
+    position: relative;
+    animation: slideInUp 0.8s ease forwards;
+    opacity: 0;
+}
+
+.simulation-chart-panel:nth-child(1) { animation-delay: 0.1s; }
+.simulation-chart-panel:nth-child(2) { animation-delay: 0.2s; }
+.simulation-chart-panel:nth-child(3) { animation-delay: 0.3s; }
+.simulation-chart-panel:nth-child(4) { animation-delay: 0.4s; }
+
+.simulation-chart-panel canvas {
+    max-height: 280px;
+}
+
+/* 城市垃圾分布组件优化 - 确保图表可见性 */
+.huarong-piece.piece-6 {
+    padding: 6px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    min-height: 140px !important; /* 增加最小高度确保图表可见 */
+    max-width: 100% !important;
+    max-height: 100% !important;
+}
+
+.huarong-piece.piece-6 .panel-title {
+    font-size: 0.85rem !important;
+    margin-bottom: 4px !important; /* 减少标题边距给图表更多空间 */
+    text-align: center;
+    color: var(--text-primary);
+    font-weight: 600;
+    line-height: 1.1 !important;
+    flex-shrink: 0 !important; /* 防止标题被压缩 */
+}
+
+.piece-6 .chart-content {
+    display: flex !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+    flex: 1 !important;
+    min-height: 0 !important;
+    padding: 4px !important;
+}
+
+/* 右侧图表容器 - 新布局 */
+.piece-6 .chart-container {
+    flex: 1.2 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 150px !important; /* 增大最小高度 */
+    background: rgba(0, 0, 0, 0.15) !important;
+    border-radius: 6px !important;
+    padding: 12px !important; /* 增加内边距 */
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* 城市垃圾图表优化 */
+.piece-6 #rubbish-city-chart {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 120px !important;
+}
+
+.huarong-piece.piece-6 canvas {
+    width: 100% !important;
+    height: 100% !important;
+    /* 放大饼图：移除极小的最大尺寸限制，设定更合理的最小尺寸 */
+    max-width: none !important;
+    max-height: none !important;
+    min-width: 140px !important;
+    min-height: 140px !important;
+    filter: brightness(1.1) contrast(1.1) !important;
+}
+
+/* 左侧图例容器 - 新布局 */
+/* 放大左侧城市图例区域 */
+.piece-6 .city-legend-container {
+    flex: 1.35 !important; /* 原 1 -> 增宽 */
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    gap: 6px !important; /* 增大行距 */
+    padding: 8px 10px 6px 10px !important; /* 增加内边距 */
+    background: linear-gradient(145deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02)) !important;
+    border: 1px solid rgba(255,255,255,0.08) !important;
+    border-radius: 10px !important;
+    overflow-y: auto !important;
+}
+
+/* 图例项目 */
+.piece-6 .legend-item {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 6px 10px !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-radius: 8px !important;
+    transition: background 0.2s ease, transform 0.2s ease !important;
+    position: relative !important;
+}
+
+.piece-6 .legend-item:hover {
+    background: rgba(255, 255, 255, 0.12) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* 图例颜色块 */
+.piece-6 .legend-color {
+    width: 14px !important;
+    height: 14px !important;
+    border-radius: 4px !important;
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.15) inset, 0 2px 4px -1px rgba(0,0,0,0.4) !important;
+    flex-shrink: 0 !important;
+}
+
+.piece-6 .legend-beijing {
+    background: rgba(255, 107, 107, 0.9) !important;
+}
+
+.piece-6 .legend-shanghai {
+    background: rgba(78, 205, 196, 0.9) !important;
+}
+
+.piece-6 .legend-guangzhou {
+    background: rgba(255, 230, 109, 0.9) !important;
+}
+
+.piece-6 .legend-shenzhen {
+    background: rgba(255, 107, 157, 0.9) !important;
+}
+
+/* 图例信息 */
+.piece-6 .legend-info {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    flex: 1 !important;
+    min-width: 0 !important;
+}
+
+.piece-6 .city-name {
+    color: var(--text-secondary) !important;
+    font-size: 0.8rem !important; /* 放大 */
+    font-weight: 600 !important;
+    letter-spacing: .5px !important;
+}
+
+.piece-6 .city-value, .piece-6 .city-percentage {
+    color: var(--text-primary) !important;
+    font-size: 0.82rem !important; /* 放大 */
+    font-weight: 600 !important;
+}
+
+/* 图例内百分比值（若使用 city-percentage 类） */
+.piece-6 .city-percentage { opacity: .95 !important; }
+
+/* 调整右侧图表容器缩放，配合 legend 变宽 */
+.piece-6 .chart-container { flex: 1 !important; }
+
+.huarong-piece.piece-6 .panel-info {
+    text-align: center !important;
+    margin-top: 2px !important; /* 减少顶边距 */
+    font-size: 0.65rem !important; /* 更小字体 */
+    flex-shrink: 0 !important; /* 防止信息被压缩 */
+}
+
+
+
+.huarong-piece.piece-6 .panel-info {
+    text-align: center !important;
+    margin-top: 6px !important; /* 减少顶边距 */
+    font-size: 0.7rem !important; /* 更小字体 */
+}
+
+.huarong-piece.piece-6 .info-text {
+    font-size: 0.85rem !important;
+    padding: 6px 10px !important;
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 响应式设计 - 模拟控制区域 */
+@media (max-width: 768px) {
+    .simulation-controls {
+        padding: 15px;
+        margin: 20px 0;
+    }
+    
+    .simulation-buttons {
+        gap: 8px;
+    }
+    
+    .simulation-controls .simulation-btn {
+        padding: 10px 15px;
+        font-size: 0.85rem;
+    }
+    
+    .simulation-charts-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .simulation-chart-panel {
+        min-height: 300px;
+    }
+    
+    .simulation-section-title {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+    }
+}
+
+/* 华容道组件响应式优化 */
+@media (max-width: 1200px) {
+    .huarong-piece {
+        padding: 15px !important;
+        min-height: 180px !important;
+        font-size: 0.9rem;
+    }
+    
+    .huarong-piece .panel-title {
+        font-size: 1rem !important;
+        margin-bottom: 10px !important;
+    }
+    
+    .piece-6 .chart-content {
+        gap: 10px !important;
+    }
+    
+    .piece-6 .legend-item {
+        font-size: 0.8rem !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .huarong-piece {
+        padding: 12px !important;
+        min-height: 160px !important;
+        font-size: 0.85rem;
+    }
+    
+    .huarong-piece .panel-title {
+        font-size: 0.9rem !important;
+        margin-bottom: 8px !important;
+    }
+    
+    .piece-6 .chart-content {
+        flex-direction: column !important;
+        gap: 8px !important;
+    }
+    
+    .piece-6 .chart-left,
+    .piece-6 .chart-right {
+        flex: none !important;
+    }
+    
+    .piece-6 .legend-item {
+        font-size: 0.75rem !important;
+    }
+    
+    .huarong-piece canvas {
+        max-height: 140px !important;
+    }
+}
+
+/* 地球容器响应式 */
+#globe-container {
+    width: 100% !important;
+    height: 400px !important;
+    min-height: 300px !important;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(30, 58, 138, 0.3), rgba(59, 130, 246, 0.3));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+#globe-container canvas {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain;
+}
+
+/* 地球加载状态 */
+#globe-container:empty::after {
+    content: '🌍 地球加载中...';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 18px;
+    text-align: center;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}
+
+/* 确保组件内容不被切割 */
+.huarong-piece * {
+    box-sizing: border-box;
+}
+
+.huarong-piece .chart-content {
+    overflow: visible !important;
+}
+
+.huarong-piece canvas {
+    overflow: visible !important;
+}
+
+/* 全局响应式图表优化 */
+canvas {
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+/* ===================== 纵向 / 窄高比统一布局覆盖 ===================== */
+/* 触发条件：宽高比 < 1 或 JS 添加 .portrait-mode
+     目标：解决窄竖窗口下 panel-grid-8 中出现极窄条状卡片、文字被裁的问题
+     策略：
+         1. 关闭原 grid-template-areas 布局，改为简单自适应列 (2列优先，极窄时1列)
+         2. 统一卡片高度（首屏可见性），允许内部滚动或缩放
+         3. 降低阴影动画与内边距，提升内容密度
+         4. 统一图表高度，避免高度撑开造成滚动条过长
+*/
+@media (max-aspect-ratio: 1/1) {
+    /* 直接使用 flex 彻底绕过 grid-area 布局 */
+    body:not(.no-portrait-auto) .panel-grid-8 { 
+        display:flex !important;
+        flex-wrap:wrap !important;
+        gap:14px !important;
+        width:100% !important; max-width:100% !important;
+    }
+    body:not(.no-portrait-auto) .panel-grid-8 .huarong-piece { 
+        flex:1 1 calc(50% - 14px) !important;
+        min-width:250px !important;
+        max-width:100% !important;
+        height:220px !important;
+        display:flex !important; flex-direction:column !important; padding:12px 12px 10px 12px !important; overflow:hidden !important;
+        grid-area:auto !important; grid-column:auto !important; grid-row:auto !important; /* 清理遗留 */
+    }
+    @media (max-width:700px) and (max-aspect-ratio:1/1){
+        body:not(.no-portrait-auto) .panel-grid-8 .huarong-piece { flex:1 1 100% !important; min-width:100% !important; }
+    }
+    body:not(.no-portrait-auto) .panel-grid-8 .huarong-piece canvas { height:120px !important; max-height:120px !important; margin-top:4px !important; }
+    body:not(.no-portrait-auto) .panel-grid-8 .piece-3,
+    body:not(.no-portrait-auto) .panel-grid-8 .piece-9,
+    body:not(.no-portrait-auto) .panel-grid-8 .piece-10 { overflow:auto !important; }
+}
+
+/* JS 降级：当浏览器不支持 aspect-ratio 媒体查询时，会通过添加 body.portrait-mode 启用相同规则 */
+body.portrait-mode .panel-grid-8 { 
+    display:flex !important; flex-wrap:wrap !important; gap:14px !important; width:100% !important; max-width:100% !important; 
+}
+body.portrait-mode .panel-grid-8 .huarong-piece { 
+    flex:1 1 calc(50% - 14px) !important; min-width:250px !important; max-width:100% !important; min-height:220px !important; height:auto !important; display:flex !important; flex-direction:column !important; padding:12px 12px 10px 12px !important; overflow:hidden !important; grid-area:auto !important; grid-column:auto !important; grid-row:auto !important; 
+}
+@media (max-width:700px){ body.portrait-mode .panel-grid-8 .huarong-piece { flex:1 1 100% !important; min-width:100% !important; } }
+body.portrait-mode .panel-grid-8 .huarong-piece canvas { height:120px !important; max-height:120px !important; margin-top:4px !important; }
+body.portrait-mode .panel-grid-8 .piece-3,
+body.portrait-mode .panel-grid-8 .piece-9,
+body.portrait-mode .panel-grid-8 .piece-10 { overflow:auto !important; }
+
+/* =========== 纵向模式紧急 Flex 回退方案 (避免极端挤压) =========== */
+body.portrait-flex-fallback .panel-grid-8 {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 14px !important;
+    grid-template-columns: none !important;
+    grid-auto-rows: unset !important;
+}
+body.portrait-flex-fallback .panel-grid-8 .huarong-piece {
+    flex: 1 1 calc(50% - 14px) !important;
+    min-width: 260px !important;
+    max-width: 100% !important;
+    min-height: 220px !important;
+    height: auto !important;
+}
+@media (max-width:600px){
+    body.portrait-flex-fallback .panel-grid-8 .huarong-piece { flex:1 1 100% !important; min-width:100% !important; }
+}
+@media (max-width:420px){
+    body.portrait-flex-fallback .panel-grid-8 .huarong-piece { height: 240px !important; }
+}
+
+/* =========== 通用列挤压自动回退（与方向无关） =========== */
+body.unify-cards .panel-grid-8 {
+    display:flex !important;
+    flex-wrap:wrap !important;
+    gap:16px !important;
+    grid-template-columns:none !important;
+    grid-auto-rows:unset !important;
+    width:100% !important;
+    max-width:100% !important;
+}
+body.unify-cards .panel-grid-8 .huarong-piece {
+    flex:1 1 calc(50% - 16px) !important;
+    min-width:260px !important;
+    max-width:100% !important;
+    min-height:240px !important;
+    height:auto !important;
+    grid-area:auto !important;
+    position:relative !important;
+}
+@media (max-width:640px){
+    body.unify-cards .panel-grid-8 .huarong-piece { flex:1 1 100% !important; min-width:100% !important; }
+}
+@media (max-width:420px){
+    body.unify-cards .panel-grid-8 .huarong-piece { min-height:260px !important; }
+}
+
+/* ========== 针对城市垃圾分布 piece-6 在两列布局下内容被裁切问题的专项修复 ==========
+   策略：提高其最小高度，并减小其内部图例/图表的垂直占用，使环形图完整显示。
+*/
+body.portrait-mode .panel-grid-8 .piece-6,
+body.portrait-flex-fallback .panel-grid-8 .piece-6,
+body.unify-cards .panel-grid-8 .piece-6 { min-height:300px !important; }
+
+/* 压缩 legend 容器，允许更多空间给图表 */
+body.portrait-mode .panel-grid-8 .piece-6 .city-legend-container,
+body.portrait-flex-fallback .panel-grid-8 .piece-6 .city-legend-container,
+body.unify-cards .panel-grid-8 .piece-6 .city-legend-container { margin:2px 4px 6px 4px !important; padding:4px 4px 2px 4px !important; gap:6px 10px !important; }
+
+/* 调整双图行最小高度，留足绘制空间 */
+body.portrait-mode .panel-grid-8 .piece-6 .city-charts-row,
+body.portrait-flex-fallback .panel-grid-8 .piece-6 .city-charts-row,
+body.unify-cards .panel-grid-8 .piece-6 .city-charts-row { min-height:200px !important; }
+
+/* 饼图/柱状图高度上限放宽，自适应剩余空间 */
+body.portrait-mode .panel-grid-8 .piece-6 .city-chart-box canvas,
+body.portrait-flex-fallback .panel-grid-8 .piece-6 .city-chart-box canvas,
+body.unify-cards .panel-grid-8 .piece-6 .city-chart-box canvas { min-height:180px !important; }
+
+/* 纵向模式下内部“大统计块”重新排布，避免一列超长挤压 */
+body.portrait-mode .panel-grid-8 .piece-3 .large-stats-grid,
+body.portrait-flex-fallback .panel-grid-8 .piece-3 .large-stats-grid {
+    display:grid !important;
+    grid-template-columns: repeat(2,minmax(0,1fr)) !important;
+    gap:6px 10px !important;
+    margin-bottom:6px !important;
+}
+body.portrait-mode .panel-grid-8 .piece-3 .large-stat-row,
+body.portrait-flex-fallback .panel-grid-8 .piece-3 .large-stat-row { display:contents !important; }
+body.portrait-mode .panel-grid-8 .piece-3 .large-stat-item,
+body.portrait-flex-fallback .panel-grid-8 .piece-3 .large-stat-item { min-height:54px !important; display:flex !important; align-items:center !important; justify-content:center !important; }
+/* 缩减 piece-3 里密度图与下方空白 */
+body.portrait-mode #density-chart, body.portrait-flex-fallback #density-chart { height:90px !important; max-height:90px !important; }
+body.portrait-mode #species-impact-chart, body.portrait-flex-fallback #species-impact-chart { height:80px !important; max-height:80px !important; }
+/* 限制 piece-3 内文字换行减少纵向拉长 */
+body.portrait-mode .piece-3 .large-stat-label, body.portrait-flex-fallback .piece-3 .large-stat-label { font-size:0.62rem !important; letter-spacing:.3px !important; }
+
+
+
+/* === 新增：城市垃圾分布垂直布局 (piece-6) === */
+.city-vertical-layout { display:flex; flex-direction:column; }
+.city-vertical-layout .city-legend-container { 
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
+    gap:8px 14px; margin:4px 4px 10px 4px; padding:6px 4px 2px 4px; 
+    background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px;
+}
+.city-vertical-layout .legend-item { 
+    display:flex; align-items:center; gap:6px; padding:4px 8px; border-radius:8px; 
+    background:linear-gradient(135deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02));
+    font-size:12px; letter-spacing:.5px; position:relative; overflow:hidden;
+}
+.city-vertical-layout .legend-item .legend-color { width:14px; height:14px; border-radius:5px; box-shadow:0 0 0 2px rgba(255,255,255,0.15) inset; }
+.city-vertical-layout .legend-item .legend-info { display:flex; flex-direction:column; line-height:1.1; }
+.city-vertical-layout .legend-item .city-name { font-weight:600; color:#e1f5fa; }
+.city-vertical-layout .legend-item .city-value { font-size:11px; opacity:.85; color:#a8dadc; }
+.city-charts-row { display:flex; gap:14px; width:100%; flex:1 1 auto; min-height:230px; margin-top:4px; }
+@media (max-width:1100px){ .city-charts-row { flex-direction:column; } }
+.city-chart-box { flex:1 1 50%; position:relative; display:flex; align-items:stretch; }
+/* 设定一个可控高度，防止百分比高度递归撑开父元素 */
+.city-chart-box { max-height:340px; min-height:240px; }
+.city-chart-box canvas { width:100% !important; height:100% !important; min-height:220px; max-height:340px; }
+/* 当父容器高度未确定时，使用固定高度兜底 */
+.city-chart-box:not(:has(canvas[height])) canvas { height:300px !important; }
+.legend-beijing { background:#ff6b6b; }
+.legend-shanghai { background:#4ecdc4; }
+.legend-guangzhou { background:#ffe66d; }
+.legend-shenzhen { background:#ff6b9d; }
+/* 新增：强制上下堆叠布局 (主页需求) */
+.city-charts-row.stack-vertical { flex-direction:column !important; gap:18px; }
+.city-charts-row.stack-vertical .city-chart-box { max-height:none; min-height:0; }
+.city-charts-row.stack-vertical .city-chart-box.large { flex:0 0 260px; }
+.city-charts-row.stack-vertical .city-chart-box:not(.large) { flex:1 1 auto; min-height:260px; }
+.city-charts-row.stack-vertical .city-chart-box.large canvas { max-height:260px !important; }
+.city-charts-row.stack-vertical .city-chart-box:not(.large) canvas { max-height:360px !important; }

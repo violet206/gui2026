@@ -1,0 +1,24 @@
+[global]
+developmentMode = false
+
+[browser]
+gatherUsageStats = false
+serverAddress = "localhost"
+
+[server]
+headless = true
+enableCORS = false
+enableXsrfProtection = false
+enableWebsocketCompression = false
+maxUploadSize = 200
+
+[client]
+caching = true
+displayEnabled = true
+
+[logger]
+level = "warning"
+
+[deprecation]
+showfileUploaderEncoding = false
+showPyplotGlobalUse = false

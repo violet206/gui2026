@@ -1,0 +1,16 @@
+# Python runtime
+__pycache__/
+*.py[cod]
+venv/
+wheels/
+
+# Runtime logs & caches
+logs/
+tile_cache/
+
+# Preview / build artifacts
+1.2Preview/
+1.2Preview.zip
+
+# Third-party copyrighted media (To The Moon OST)
+*.mp3

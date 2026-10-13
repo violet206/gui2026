@@ -1,0 +1,40 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"/><title>来源溯源地图 · Source Attribution</title><meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="stylesheet" href="styles.css"/><link rel="stylesheet" href="shared-ui.css"/><script src="utils.js"></script><style>body{margin:0;font-family:Roboto,Arial,sans-serif;}header{display:flex;justify-content:space-between;align-items:center;padding:12px 18px}main{max-width:1400px;margin:0 auto;padding:12px 20px 60px}.flex{display:flex;gap:22px;flex-wrap:wrap}.left{flex:0 0 320px}.panel{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);padding:14px 16px;border-radius:16px}h3{margin:0 0 8px;font-size:15px;letter-spacing:.5px}#mapBox{flex:1;min-height:520px;position:relative;background:#021521;border:1px solid rgba(255,255,255,0.1);border-radius:18px;overflow:hidden}#mapPlaceholder{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#6fb9d6;font-size:14px} .src-list{max-height:260px;overflow:auto;font-size:12px;line-height:1.5} .flow-item{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed rgba(255,255,255,0.08)} .badge{padding:2px 6px;border-radius:12px;font-size:11px;background:#104563;color:#b9ecff;margin-left:6px}</style></head><body class="themed-page"><header class="frost-header"><div>🧩 来源溯源</div><nav><a href="main.html" class="back-link small">← 返回主页面</a></nav></header><main>
+<div class="flex">
+  <div class="left">
+    <div class="panel">
+      <h3>筛选 Filters</h3>
+      <label style="font-size:12px;opacity:.8">区域 Region</label>
+      <select id="regionSel" style="width:100%;margin:4px 0 8px;padding:4px 6px;border-radius:8px;background:#0c3246;color:#cdefff;border:1px solid #1d5672">
+        <option value="global">Global</option>
+        <option value="pacific">Pacific</option>
+        <option value="atlantic">Atlantic</option>
+        <option value="indian">Indian</option>
+      </select>
+      <label style="font-size:12px;opacity:.8">最小排放阈值 Min Emission</label>
+      <input type="range" id="minEmit" min="0" max="100" value="10" style="width:100%"><span id="minEmitVal" style="font-size:12px">10</span>
+    </div>
+    <div class="panel" style="margin-top:16px">
+      <h3>主要来源 Top Sources</h3>
+      <div class="src-list" id="srcList"></div>
+    </div>
+  </div>
+  <div id="mapBox">
+    <div id="mapPlaceholder">尝试加载地图脚本 (ECharts / Leaflet)...</div>
+    <canvas id="flowLayer" width="900" height="520" style="position:absolute;inset:0;width:100%;height:100%"></canvas>
+  </div>
+</div>
+</main>
+<script>
+const U=window.__UTILS__;
+const flows=[]; const regions=['pacific','atlantic','indian']; function genData(){ flows.length=0; for(let i=0;i<42;i++){ flows.push({ id:i, river:'R'+(i+1), region: regions[i%regions.length], emission: +(Math.random()*100).toFixed(1), lon: U.rand(-160,160), lat: U.rand(-70,70), targetLon: U.rand(-160,160), targetLat: U.rand(-70,70) }); } } genData();
+const canvas=document.getElementById('flowLayer'); const ctx=canvas.getContext('2d');
+function project(lon,lat){ // 简单等矩形投影 (placeholder)
+  const x=(lon+180)/360*canvas.width; const y = (90-lat)/180*canvas.height; return [x,y]; }
+function render(){ ctx.fillStyle='rgba(2,21,33,0.55)'; ctx.fillRect(0,0,canvas.width,canvas.height); const region=regionSel.value; const minE=+minEmit.value; const filtered=flows.filter(f=> (region==='global'|| f.region===region) && f.emission>=minE ); ctx.lineWidth=1; filtered.forEach(f=>{ const [x1,y1]=project(f.lon,f.lat); const [x2,y2]=project(f.targetLon,f.targetLat); const grd=ctx.createLinearGradient(x1,y1,x2,y2); grd.addColorStop(0,'#4cc9f0'); grd.addColorStop(1,'#ffb703'); ctx.strokeStyle=grd; ctx.beginPath(); ctx.moveTo(x1,y1); const mx=(x1+x2)/2, my=(y1+y2)/2 - 20; ctx.quadraticCurveTo(mx,my,x2,y2); ctx.stroke(); }); updateList(filtered); }
+function updateList(list){ srcList.innerHTML = list.slice(0,20).sort((a,b)=>b.emission-a.emission).map(f=>`<div class='flow-item'><span>${f.river}<span class='badge'>${f.region}</span></span><b>${f.emission}</b></div>`).join('') || '<em style="opacity:.6">无数据</em>'; }
+minEmit.addEventListener('input',()=>{ minEmitVal.textContent=minEmit.value; render(); }); regionSel.addEventListener('change',render);
+render();
+// 尝试动态加载 ECharts (可替换为真实地图)
+(async function tryECharts(){ if(typeof echarts!=='undefined'){ initE(); return; } try{ await U.loadScript('https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js'); if(typeof echarts!=='undefined'){ initE(); } else { throw 0; } }catch(e){ document.getElementById('mapPlaceholder').textContent='使用 Canvas 升级为地图功能 (ECharts 未加载)'; } })();
+function initE(){ const ph=document.getElementById('mapPlaceholder'); ph.textContent='ECharts Loaded - 可接入真实底图 / GeoJSON'; ph.style.fontSize='12px'; }
+</script></body></html>

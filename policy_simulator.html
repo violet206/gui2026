@@ -1,0 +1,70 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"/><title>政策模拟 · Policy Simulator (独立页面)</title><meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="stylesheet" href="styles.css"/><link rel="stylesheet" href="shared-ui.css"/><link rel="stylesheet" href="education_walkthrough.css"/><script src="utils.js"></script><style>body{margin:0;font-family:Roboto,Arial,sans-serif;min-height:100vh;display:flex;flex-direction:column;overflow:hidden;}main{flex:1 1 auto;padding:0;display:flex;flex-direction:column;min-height:0;} .sim-standalone{margin:0;flex:1 1 auto;display:flex;flex-direction:column;background:rgba(0,0,0,0.38);border:0;border-radius:0;padding:14px 24px 18px 24px;backdrop-filter:blur(14px);} .sim-standalone h1{margin:0 0 10px;font-size:28px;letter-spacing:.5px;display:flex;align-items:center;gap:12px;} .sim-standalone h1 span{font-size:14px;letter-spacing:0;font-weight:500;opacity:.85} .sim-grid{flex:1 1 auto;display:grid;grid-template-columns:320px 1fr;gap:22px;align-items:stretch;min-height:0;}@media (max-width:1100px){.sim-grid{grid-template-columns:1fr;}} .controls{display:flex;flex-direction:column;overflow:auto;padding-right:4px;} .controls::-webkit-scrollbar{width:8px;} .controls::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.18);border-radius:4px;} .controls label{font-size:12px;display:flex;flex-direction:column;gap:4px;margin-bottom:10px;} .controls input[type=number], .controls select{background:#062b3b;color:#e1f6ff;border:1px solid #0f445c;padding:5px 9px;border-radius:10px;font-size:13px;} .controls input[type=range]{width:100%;accent-color:#33b9ff;} .buttons{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;} .buttons button{background:#0d3a50;color:#d8f3ff;border:1px solid #1d5f79;padding:6px 12px;border-radius:16px;cursor:pointer;font-size:12px;letter-spacing:.5px;} .buttons button:hover{background:#144a63} .chart-wrap{position:relative;min-height:0;height:100%;display:flex;flex-direction:column;} .chart-wrap canvas{flex:1 1 auto !important;max-height:none !important;} .kpi-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px;} .kpi{flex:1 1 140px;min-width:140px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.18);padding:8px 10px;border-radius:12px;backdrop-filter:blur(6px);display:flex;flex-direction:column;gap:4px;} .kpi-value{font-size:17px;font-weight:600;color:#fff;letter-spacing:.5px;} .kpi-label{font-size:10px;opacity:.78;letter-spacing:.5px;} footer{display:none;} #chartFallback{display:none;padding:6px 8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.14);border-radius:12px;margin-top:8px;font-size:12px} header.frost-header{padding:8px 16px;} header.frost-header nav a{font-size:12px;} .sim-standalone>div:first-of-type{flex-wrap:wrap;} /* 亮色主题覆盖 */ body.theme-light .sim-standalone{background:rgba(255,255,255,0.55);} body.theme-light .controls input[type=number], body.theme-light .controls select{background:#f0f7fa;color:#0d2d3a;border-color:#9cc3d4;} body.theme-light .controls input[type=range]{accent-color:#1479b8;} body.theme-light .buttons button{background:#e3f2f9;color:#0d2d3a;border-color:#8fb9cc;} body.theme-light .buttons button:hover{background:#cfe8f2;} body.theme-light .kpi{background:rgba(255,255,255,0.85);border-color:rgba(0,0,0,0.08);} body.theme-light .kpi-value{color:#194556;} body.theme-light header.frost-header{background:rgba(255,255,255,0.75);} body.theme-light #playYearInfo{background:rgba(0,0,0,0.06);color:#194556;} body.theme-light label{color:#0d2d3a;} body.theme-light #advancedPanel{background:rgba(255,255,255,0.65);border-color:rgba(0,0,0,0.12);} body.theme-light #snapshotList li{background:rgba(255,255,255,0.8);border-color:rgba(0,0,0,0.15);} body.theme-light #snapshotList button[data-act=load]{background:#e2f3ff;color:#114158;border-color:#7db2c6;} body.theme-light #snapshotList button[data-act=del]{background:#ffe4e4;color:#7a2e2e;border-color:#d28a8a;} </style></head><body class="themed-page">
+  <video id="bg-video" class="bg-video" muted autoplay loop playsinline preload="auto" poster="imgs/deep_blue_ocean_gradient_abstract_background_scientific.jpg"><source src="https://cdn.pixabay.com/video/2016/09/13/5200-183786525_large.mp4" type="video/mp4"></video>
+  <canvas id="particle-canvas"></canvas>
+<header class="frost-header" style="flex:0 0 auto;display:flex;justify-content:space-between;align-items:center;"><div>🧭 政策模拟（独立）</div><nav style="display:flex;align-items:center;gap:10px;"><button id="themeToggle" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.35);padding:4px 12px;border-radius:18px;cursor:pointer;font-size:12px;backdrop-filter:blur(4px);">🌗 亮/暗</button><a href="main.html" class="back-link small">← 返回主页面</a></nav></header><main>
+  <section class="sim-standalone" id="policy-sim-standalone">
+    <h1>政策模拟 <span>Policy Simulator</span></h1>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin:-12px 0 20px 0;align-items:center;">
+      <button id="playToggle" style="background:#15516d;color:#d8f6ff;border:1px solid #1d6f8c;padding:6px 14px;border-radius:18px;cursor:pointer;font-size:12px;letter-spacing:.5px;">▶ 播放</button>
+      <span id="playYearInfo" style="font-size:12px;opacity:.8;padding:4px 10px;border:1px solid rgba(255,255,255,0.18);border-radius:14px;background:rgba(255,255,255,0.06);">Year: 0 / 0</span>
+  <button id="axisModeBtn" style="background:#12394c;color:#d8f6ff;border:1px solid #1d566c;padding:6px 12px;border-radius:18px;cursor:pointer;font-size:12px;letter-spacing:.5px;">轴:锁定</button>
+      <label style="font-size:11px;display:flex;align-items:center;gap:4px;background:rgba(255,255,255,0.06);padding:4px 8px;border-radius:14px;border:1px solid rgba(255,255,255,0.18);"><input type="checkbox" id="chkContinuePlay">变化不停止</label>
+      <label style="font-size:11px;display:flex;align-items:center;gap:4px;background:rgba(255,255,255,0.06);padding:4px 8px;border-radius:14px;border:1px solid rgba(255,255,255,0.18);">速度<select id="playSpeed" style="background:#0d3a50;color:#d8f6ff;border:1px solid #1d5f79;padding:2px 6px;border-radius:8px;font-size:11px;"><option value="slow">慢</option><option value="normal" selected>正常</option><option value="fast">快</option><option value="turbo">极速</option></select></label>
+      <label style="font-size:11px;display:flex;align-items:center;gap:4px;background:rgba(255,255,255,0.06);padding:4px 8px;border-radius:14px;border:1px solid rgba(255,255,255,0.18);">平滑<select id="stockSmoothing" style="background:#0d3a50;color:#d8f6ff;border:1px solid #1d5f79;padding:2px 6px;border-radius:8px;font-size:11px;"><option value="none" selected>无</option><option value="ma3">MA3</option><option value="ma5">MA5</option><option value="ema03">EMA0.3</option></select></label>
+      <label style="font-size:11px;display:flex;align-items:center;gap:4px;background:rgba(255,255,255,0.06);padding:4px 8px;border-radius:14px;border:1px solid rgba(255,255,255,0.18);"><input type="checkbox" id="chkResumeOnLoad" checked>载入快照自动播放</label>
+      <button id="exportPNG" style="background:#15516d;color:#d8f6ff;border:1px solid #1d6f8c;padding:6px 14px;border-radius:18px;cursor:pointer;font-size:12px;">导出 PNG</button>
+      <button id="toggleAdvanced" style="background:#134357;color:#d8f6ff;border:1px solid #1a586d;padding:6px 14px;border-radius:18px;cursor:pointer;font-size:12px;">高级参数 ▼</button>
+      <button id="clearSnapshots" style="background:#3d2f0b;color:#ffe9b2;border:1px solid #806522;padding:6px 14px;border-radius:18px;cursor:pointer;font-size:12px;">清空快照</button>
+    </div>
+    <div class="sim-grid">
+      <div class="controls">
+        <label>Base Inflow（吨/年）<input type="number" id="baseInflow" value="8200000" step="10000"></label>
+        <label>Reduction % <input type="range" id="reduction" min="0" max="100" value="10"><span id="reductionVal">10%</span></label>
+        <label>Calming（执行效率） <input type="range" id="calming" min="0" max="1" step="0.01" value="0.8"><span id="calmingVal">0.80</span></label>
+        <label>Auto-refresh <select id="autoRefresh"><option value="1">1/年</option><option value="4">4/年</option><option value="12">12/年</option></select></label>
+        <label>Years <input type="number" id="years" value="25" min="1" max="100"></label>
+        <div class="buttons"><button id="applySim">应用情景</button> <button id="resetSim">重置</button> <button id="exportCSV">导出 CSV</button> <button id="saveSnapshot" style="background:#234d2f;border-color:#2d6d3d;">保存快照</button></div>
+        <div id="advancedPanel" style="display:none;margin-top:14px;padding:12px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:14px;font-size:12px;">
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <label style="margin:0;">Removal Rate（%/年）<input type="range" id="advRemoval" min="0" max="8" value="2"><span id="advRemovalVal">2%</span></label>
+            <label style="margin:0;">Auto Factor Boost<input type="range" id="advBoost" min="0" max="30" value="0"><span id="advBoostVal">0%</span></label>
+            <small style="opacity:.7;line-height:1.4">说明：Removal 影响 stock_t 的自然移除；Boost 额外叠加在自动刷新频率系数上。</small>
+          </div>
+        </div>
+        <p style="font-size:11px;line-height:1.5;opacity:.75;margin-top:6px;">模型示意：stock_{t+1} = stock_t + adjustedInflow - removalRate*stock_t。<br>effectiveReduction = reduction * calming * autoRefreshFactor。</p>
+        <div style="margin-top:14px;">
+          <h4 style="margin:0 0 8px;font-size:12px;letter-spacing:.5px;opacity:.85;">快照 Snapshots</h4>
+          <ul id="snapshotList" style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px;max-height:180px;overflow:auto;font-size:11px;"></ul>
+          <details style="margin-top:10px;">
+            <summary style="cursor:pointer;font-size:11px;opacity:.75;">叠加对比 (勾选需要在图上显示的快照)</summary>
+            <div id="overlaySelect" style="display:flex;flex-direction:column;gap:4px;margin-top:6px;font-size:11px;max-height:150px;overflow:auto;"></div>
+            <div id="deltaRanking" style="margin-top:8px;display:flex;flex-direction:column;gap:4px;font-size:10px;padding:6px 6px 8px 6px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.14);border-radius:8px;">
+              <div style="opacity:.7;letter-spacing:.5px;">差异排名 (Final / Peak)</div>
+              <div id="deltaRankingList" style="display:flex;flex-direction:column;gap:3px;max-height:120px;overflow:auto;"></div>
+            </div>
+          </details>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="policyChart" aria-label="政策模拟折线图" role="img"></canvas>
+        <div id="chartFallback">Chart.js 未加载，显示数值回退。</div>
+        <!-- 双光标对比信息框 Dual cursor compare box -->
+        <div id="compareBox" style="position:absolute;top:8px;right:8px;z-index:10;display:flex;flex-direction:column;gap:4px;background:rgba(0,0,0,0.42);border:1px solid rgba(255,255,255,0.18);border-radius:10px;padding:6px 10px;font-size:11px;line-height:1.35;backdrop-filter:blur(6px);max-width:200px;pointer-events:none;">
+          <div style="opacity:.75;">双击清除光标<br>单击设置 A/B</div>
+          <div id="compareContent" style="font-family:monospace;white-space:nowrap;">A: —  B: —</div>
+        </div>
+      </div>
+    </div>
+  <div class="kpi-row" style="margin-bottom:2px;">
+      <div class="kpi" id="kpiAdjusted"><div class="kpi-value">—</div><div class="kpi-label">Adjusted Inflow（年）</div></div>
+      <div class="kpi" id="kpiAnnualRed"><div class="kpi-value">—</div><div class="kpi-label">Annual Reduction</div></div>
+      <div class="kpi" id="kpiCumulative"><div class="kpi-value">—</div><div class="kpi-label">Cumulative Reduction</div></div>
+      <div class="kpi" id="kpiFinalStock"><div class="kpi-value">—</div><div class="kpi-label">Final Stock</div></div>
+      <div class="kpi" id="kpiPeakYear"><div class="kpi-value">—</div><div class="kpi-label">Peak Year</div></div>
+      <div class="kpi" id="kpiAvgStock"><div class="kpi-value">—</div><div class="kpi-label">Avg Stock</div></div>
+    </div>
+  </section>
+</main>
+<footer></footer>
+<script src="policy_sim.js"></script>
+</body></html>

@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐬海洋塑料污染数据分析展示平台</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="shared-ui.css">
+    <!-- 追加自定义附加样式 (style2) 放在主样式后，便于覆盖 -->
+    <!-- style2.css 已弃用：引用清理 -->
+    <!-- 字体与全局样式就绪，Chart.js 由 body 底部多 CDN 动态加载（已移除 Three.js） -->
+</head>
+<body>
+    <div class="main-content">
+        <!-- 统一导航条：返回起始页 + 扩展功能入口 -->
+        <nav id="global-nav" class="glass-card" style="position:fixed;top:8px;left:8px;right:8px;z-index:40;display:flex;align-items:center;justify-content:space-between;padding:6px 14px;border-radius:18px;backdrop-filter:blur(12px);background:rgba(0,0,0,0.28);">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                <a href="explore.html" style="color:#8de9ff;text-decoration:none;font-size:13px;letter-spacing:.5px;">← 起始页</a>
+                <button class="nav-pill-btn" onclick="document.getElementById('ext-features-card').scrollIntoView({behavior:'smooth'});">扩展功能 ▼</button>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <a href="education_walkthrough.html" class="mini-nav-link" style="color:#c6f2ff;font-size:12px;text-decoration:none;">教育引导</a>
+                <a href="drift_lab.html" class="mini-nav-link" style="color:#c6f2ff;font-size:12px;text-decoration:none;">漂流实验室</a>
+                <a href="policy_simulator.html" class="mini-nav-link" style="color:#c6f2ff;font-size:12px;text-decoration:none;">政策模拟</a>
+                <a href="scenario_compare.html" class="mini-nav-link" style="color:#c6f2ff;font-size:12px;text-decoration:none;">情景对比</a>
+                <a href="source_attribution.html" class="mini-nav-link" style="color:#c6f2ff;font-size:12px;text-decoration:none;">来源溯源</a>
+                <a href="prediction_lab.html" class="mini-nav-link" style="color:#c6f2ff;font-size:12px;text-decoration:none;">预测实验室</a>
+            </div>
+        </nav>
+        <!-- 背景视频：在最底层，使用 muted autoplay loop playsinline 避免移动端限制 -->
+        <video id="bg-video" class="bg-video" muted autoplay loop playsinline preload="auto" poster="imgs/deep_blue_ocean_gradient_abstract_background_scientific.jpg">
+            <source src="https://cdn.pixabay.com/video/2016/09/13/5200-183786525_large.mp4" type="video/mp4">
+        </video>
+        <!-- 粒子背景画布 -->
+        <canvas id="particle-canvas"></canvas>
+
+        <!-- 页面标题区域 -->
+                <header class="header animated-header">
+                        <div class="title-block">
+                            <h1 class="title">🐬 海洋塑料污染数据分析展示平台</h1>
+                            <p class="subtitle">多源数据 · 可视化探索 · 交互式演示</p>
+                        </div>
+                </header>
+
+        <!-- 精简：移除未使用 3D 地球，改为顶部分布式操作栏 -->
+        <div class="top-controls-bar glass-card compact-bar">
+                        <div class="tc-left" style="display:flex;gap:10px;flex-wrap:wrap;">
+                                <button class="demo-btn" onclick="navigateToDemo()">🌊 详细漂流演示 <span class="btn-arrow">→</span></button>
+                                <a href="display_wall.html" class="demo-btn" style="text-decoration:none;display:inline-flex;align-items:center;gap:4px;">
+                                    📊 数据大屏 <span class="btn-arrow">→</span>
+                                </a>
+                        </div>
+            <div class="tc-right" id="simulation-status-compact"><span class="status-text">自动刷新中…</span></div>
+        </div>
+
+        <!-- 原简化漂流模拟折叠面板已删除：避免与 Streamlit 内嵌版本重复 -->
+
+            <!-- 粒子背景画布 -->
+            <!-- 区域3: 华容道组件区域 -->
+    <section class="components-section">
+            <div class="layout-frame">
+        <!-- 只保留一个网格类，避免双重 grid 定义导致混乱 -->
+                <div class="huarong-puzzle-container panel-grid-8 glass-card">
+                    <!-- 小矩形 -->
+                    <div class="huarong-piece piece-1 u-s panel chart-panel">
+                        <h3 class="panel-title">🌊 海洋污染</h3>
+                        <div class="ocean-pollution-card">
+                            <div class="ocean-pollution-main">
+                                <div class="main-value">8.2M</div>
+                                <div class="main-label">吨/年 估算输入</div>
+                            </div>
+                            <!-- 漂流演示脚本已移除（集中于 Streamlit 页面） -->
+                            <div class="ocean-pollution-sub">
+                                <div class="sub-box">
+                                    <div class="sub-value">80%</div>
+                                    <div class="sub-label">陆源贡献</div>
+                                </div>
+                                <div class="sub-box">
+                                    <div class="sub-value">5.25万亿</div>
+                                    <div class="sub-label">碎片数量</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 长方形(2倍) -->
+                    <div class="huarong-piece piece-2 u-m panel chart-panel">
+                        <h3 class="panel-title">🏭 塑料污染来源统计</h3>
+                        <canvas id="source-chart"></canvas>
+                        <div class="panel-info">
+                            <span class="info-text">陆地来源占 80%</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 大方形(4倍) -->
+                    <div class="huarong-piece piece-3 u-l panel stats-panel" onclick="toggleEcoChart(this)">
+                        <h3 class="panel-title">🌍 生态影响统计</h3>
+                        <div class="large-stats-grid">
+                            <div class="large-stat-row">
+                                <div class="large-stat-item">
+                                    <div class="large-stat-number">800+</div>
+                                    <div class="large-stat-label">受影响物种</div>
+                                </div>
+                                <div class="large-stat-item">
+                                    <div class="large-stat-number">5.25万亿</div>
+                                    <div class="large-stat-label">塑料颗粒</div>
+                                </div>
+                            </div>
+                            <div class="large-stat-row">
+                                <div class="large-stat-item">
+                                    <div class="large-stat-number">269,000</div>
+                                    <div class="large-stat-label">吨漂浮塑料</div>
+                                </div>
+                                <div class="large-stat-item">
+                                    <div class="large-stat-number">90%</div>
+                                    <div class="large-stat-label">海鸟含塑料</div>
+                                </div>
+                            </div>
+                        </div>
+                        <canvas id="density-chart" style="margin-top: 10px; height: 100px;"></canvas>
+                    </div>
+                    
+                    <!-- 小矩形 -->
+                    <div class="huarong-piece piece-4 u-s panel chart-panel">
+                        <h3 class="panel-title">📈 历史趋势</h3>
+                        <canvas id="trend-chart"></canvas>
+                    </div>
+                    
+                    <!-- 竖长方形(2倍) -->
+                    <div class="huarong-piece piece-5 u-m panel chart-panel simulation-chart-panel">
+                                                <h3 class="panel-title" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+                                                    <span>年度误管理塑料趋势</span>
+                                                    <span id="rubbish-yearly-range-label" style="font-size:11px;color:#89c2d9;letter-spacing:.5px;opacity:.85;">近20年</span>
+                                                </h3>
+                                                <div class="yearly-controls" style="display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 8px 0;font-size:11px;align-items:center;">
+                                                    <label style="display:flex;align-items:center;gap:4px;">窗口
+                                                        <select id="rubbish-range" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);color:#d8f3fd;padding:2px 6px;border-radius:6px;font-size:11px;">
+                                                            <option value="10">近10年</option>
+                                                            <option value="15">近15年</option>
+                                                            <option value="20" selected>近20年</option>
+                                                            <option value="30">近30年</option>
+                                                        </select>
+                                                    </label>
+                                                    <label style="display:flex;align-items:center;gap:4px;cursor:pointer;">
+                                                        <input type="checkbox" id="rubbish-ma" checked style="accent-color:#4dbafd;"> 移动均值(5)
+                                                    </label>
+                                                    <label style="display:flex;align-items:center;gap:4px;cursor:pointer;">
+                                                        <input type="checkbox" id="rubbish-forecast" style="accent-color:#ffc857;"> 预测+5年
+                                                    </label>
+                                                    <label style="display:flex;align-items:center;gap:4px;cursor:pointer;">
+                                                        <input type="checkbox" id="rubbish-yoy" style="accent-color:#ff6b6b;" checked> 同比图
+                                                    </label>
+                                                </div>
+                                                                        <div class="yearly-chart-wrap">
+                                                                            <canvas id="rubbish-yearly-chart"></canvas>
+                                                                        </div>
+                                                                                                <canvas id="rubbish-yearly-mini-chart" style="margin-top:6px;height:56px;display:block;"></canvas>
+                                                                                                <canvas id="rubbish-yearly-yoy-chart" style="margin-top:8px;height:90px;display:none;"></canvas>
+                                                                                                <div id="rubbish-forecast-table" style="display:none;margin-top:10px;font-size:11px;line-height:1.4;color:#d8f3fd;"></div>
+                                                <div class="panel-info" style="margin-top:6px;">
+                                                        <span class="info-text" id="rubbish-yearly-data-note">来源: OWID</span>
+                                                        <div id="rubbish-yearly-kpis" class="yearly-kpis" style="margin-top:6px;display:flex;flex-wrap:wrap;gap:6px;"></div>
+                                                </div>
+                    </div>
+                    
+                    <!-- 竖长方形(2倍) -->
+                    <div class="huarong-piece piece-6 u-m panel chart-panel simulation-chart-panel city-vertical-layout">
+                        <h3 class="panel-title">主要国家误管理占比</h3>
+                        <!-- 动态图例容器：由 charts.js updateCityLegend 注入 -->
+                        <div id="rubbish-city-legend" class="city-legend-container city-legend legend-grid"></div>
+                        <div class="city-charts-row expanded stack-vertical">
+                            <div class="city-chart-box large">
+                                <canvas id="rubbish-city-chart"></canvas>
+                            </div>
+                            <div class="city-chart-box">
+                                <canvas id="rubbish-city-bar-chart"></canvas>
+                            </div>
+                        </div>
+                        <div class="panel-info"><span class="info-text">Top5 国家 (归一化)</span></div>
+                    </div>
+                    
+                    <!-- 小矩形 -->
+                    <div class="huarong-piece piece-7 u-m panel chart-panel simulation-chart-panel">
+                        <h3 class="panel-title">🌊 洋流速度分布</h3>
+                        <canvas id="ocean-river-chart"></canvas>
+                        <div class="panel-info"><span class="info-text">OSCAR 采样速度</span></div>
+                    </div>
+                    
+                    <!-- 横长方形(2倍) -->
+                    <div class="huarong-piece piece-8 u-m panel chart-panel simulation-chart-panel">
+                        <h3 class="panel-title">📈 洋流指标概览</h3>
+                        <canvas id="ocean-overview-chart"></canvas>
+                        <div class="panel-info"><span class="info-text">OSCAR 样本统计</span></div>
+                    </div>
+                    <!-- 新增：沿海城市海洋生物减少模拟 -->
+                    <div class="huarong-piece piece-9 u-m panel chart-panel simulation-chart-panel">
+                        <h3 class="panel-title">🧬 沿海城市生物减少</h3>
+                        <canvas id="marine-bio-loss-chart"></canvas>
+                        <div class="panel-info">
+                            <span class="info-text">模拟数据 (data_simulated2)</span>
+                            <div id="bio-loss-missing" style="display:none;margin-top:6px;">
+                                <button id="generate-bio-loss" class="control-btn" style="padding:4px 10px;font-size:12px;">⚙ 生成 CSV</button>
+                                <span style="display:block;font-size:11px;color:#a8dadc;margin-top:4px;opacity:.85;">缺少源数据，正在使用内置模拟</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 新增：沿海城市水质影响模拟 -->
+                    <div class="huarong-piece piece-10 u-m panel chart-panel simulation-chart-panel">
+                        <h3 class="panel-title">💧 沿海城市水质影响</h3>
+                        <canvas id="water-quality-chart"></canvas>
+                        <div class="panel-info">
+                            <span class="info-text">模拟数据 (simulate_water)</span>
+                        </div>
+                    </div>
+                    <!-- 扩展功能导航卡片：滚动锚点 -->
+                    <div id="ext-features-card" class="huarong-piece u-l panel glass-card" style="display:flex;flex-direction:column;gap:10px;">
+                        <h3 class="panel-title">🧩 扩展功能入口</h3>
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;font-size:12px;">
+                            <a class="ext-link-tile" href="drift_lab.html">🌊 漂流实验室</a>
+                            <a class="ext-link-tile" href="policy_simulator.html">🧭 政策评估</a>
+                            <a class="ext-link-tile" href="scenario_compare.html">🧪 情景对比</a>
+                            <a class="ext-link-tile" href="source_attribution.html">🧩 来源溯源</a>
+                            <a class="ext-link-tile" href="prediction_lab.html">📈 预测实验室</a>
+                            <a class="ext-link-tile" href="education_walkthrough.html">🎓 教育引导</a>
+                        </div>
+                        <p style="font-size:11px;opacity:.7;margin:0;line-height:1.5;">这些页面为增强 / 教学 / 分析扩展模块，可在离线模式下以合成数据运行。若需真实数据，请切换到本地 HTTP + Streamlit 后端组合。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 信息面板 -->
+        <section class="info-section">
+            <div class="panel info-panel">
+                <h3 class="panel-title">关键概念</h3>
+                <div class="concept-links">
+                    <a href="https://baike.baidu.com/item/海洋污染" target="_blank" class="concept-link">海洋污染</a>
+                    <a href="https://baike.baidu.com/item/太平洋垃圾带" target="_blank" class="concept-link">太平洋垃圾带</a>
+                    <a href="https://baike.baidu.com/item/微塑料" target="_blank" class="concept-link">微塑料</a>
+                    <a href="https://baike.baidu.com/item/海洋环流" target="_blank" class="concept-link">海洋环流</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 底部导航 -->
+        <footer class="footer">
+            <div class="footer-content">
+                <p class="footer-text">海洋塑料污染数据可视化平台 © 2025</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="particles.js"></script>
+    <script>
+    (function loadChartMultiCDN(){
+        const sources=[
+            'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js',
+            'https://unpkg.com/chart.js@4.4.1/dist/chart.umd.min.js',
+            'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js'
+        ];
+        let i=0; function attempt(){
+            if(window.Chart){ console.log('[Loader] Chart.js 已存在'); document.dispatchEvent(new Event('chart-ready')); return; }
+            if(i>=sources.length){ console.warn('[Loader] 所有 Chart.js CDN 失败'); window.__CHART_FAILED__=true; return; }
+            const src=sources[i++];
+            const s=document.createElement('script');
+            s.src=src; s.onload=()=>{ console.log('[Loader] Chart.js 加载成功:',src); document.dispatchEvent(new Event('chart-ready')); };
+            s.onerror=()=>{ console.warn('[Loader] Chart.js 失败:',src); setTimeout(attempt,200); };
+            document.head.appendChild(s);
+        } attempt();
+    })();
+    </script>
+        <script>
+            // 监听 policy simulator 的结果，展示在页面顶部的 simulation-status-compact 小区域
+            (function bindPolicyStatus(){
+                const KEY='ocean_platform_policy_sim_v1';
+                function showStatus(payload){
+                    const wrap=document.getElementById('simulation-status-compact'); if(!wrap) return;
+                    try{
+                        const params = payload?.params || {}; const res = payload?.result || {};
+                        wrap.innerHTML = `<span class="status-text">Policy Sim • 调整后年输入: ${Math.round(res.adjustedInflow||0).toLocaleString()} t</span>`;
+                        // also try to push into chartManager
+                        if(window.chartManager){
+                            window.chartManager._policySim = { ts: payload.timestamp || Date.now(), params, result: res };
+                            if(typeof window.chartManager.onExternalStateUpdate === 'function'){
+                                try{ window.chartManager.onExternalStateUpdate(window.chartManager._policySim); }catch(e){console.warn('[Main] chartManager update failed',e);} 
+                            }
+                        }
+                    }catch(e){ console.warn('[Main] showStatus failed',e); }
+                }
+                window.addEventListener('policy-sim:updated', (ev)=>{ try{ let payload = ev.detail && ev.detail.payload; if(!payload){ const raw = localStorage.getItem(KEY); if(raw) payload = JSON.parse(raw); } if(payload) setTimeout(()=>showStatus(payload),100); }catch(e){console.warn('[Main] event',e);} });
+                // init from existing key
+                try{ const raw = localStorage.getItem(KEY); if(raw){ const payload = JSON.parse(raw); setTimeout(()=>showStatus(payload),200); } }catch(e){}
+            })();
+        </script>
+    <!-- 新增：数据服务抽象 (B1) 必须在 charts.js 之前 -->
+    <script src="dataService.js"></script>
+    <script src="charts.js"></script>
+    <script src="responsive-layout.js"></script>
+    <script src="overflow-detector.js"></script>
+    <script src="main.js"></script>
+    <script>
+    // 背景视频加载与回退处理
+    (function initBgVideo(){
+        const v=document.getElementById('bg-video');
+        if(!v) return;
+        let loaded=false;
+        const timeout=setTimeout(()=>{
+            if(!loaded){ v.parentElement && v.parentElement.removeChild(v); console.warn('[BGVideo] 加载超时，已移除保留静态背景'); }
+        },12000);
+        v.addEventListener('canplay',()=>{ loaded=true; clearTimeout(timeout); v.classList.add('bg-video-ready'); },{once:true});
+        v.addEventListener('error',()=>{ clearTimeout(timeout); if(v.parentElement){ v.parentElement.removeChild(v); console.warn('[BGVideo] 加载失败，移除 video'); } });
+        // 提供手动暂停/播放调试接口
+        window.toggleBgVideo=()=>{ if(!v) return; if(v.paused){ v.play(); console.log('[BGVideo] play'); } else { v.pause(); console.log('[BGVideo] pause'); } };
+    })();
+    </script>
+    <style>
+      /* 背景视频样式：保持在粒子 canvas 之下（z-index:-2），粒子仍为 -1 */
+      .bg-video{ position:fixed; inset:0; width:100%; height:100%; object-fit:cover; z-index:-2; opacity:0; transition:opacity 1.2s ease; filter:brightness(0.9) saturate(1.1); }
+      .bg-video-ready{ opacity:1; }
+      /* 若需要在某些低性能设备禁用视频，可在 body 加 class no-video 再隐藏 */
+      body.no-video .bg-video{ display:none !important; }
+            /* 统一导航条 & 扩展卡片样式 */
+            #global-nav .mini-nav-link:hover{ text-decoration:underline; }
+            .ext-link-tile{display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);padding:12px 10px;border-radius:12px;color:#d4f3ff;text-decoration:none;backdrop-filter:blur(6px);transition:background .25s,border-color .25s,transform .25s;}
+            .ext-link-tile:hover{background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.25);transform:translateY(-2px);}
+            @media (max-width:980px){ #global-nav{flex-direction:column;align-items:flex-start;gap:6px;} }
+    </style>
+    <script>
+    // file:// 环境检测（本地直接双击可能导致 fetch CORS 失败）
+    (function detectFileMode(){
+        if(location.protocol === 'file:'){
+            window.__FILE_MODE__ = true;
+            console.warn('[Env] 当前以 file:// 方式打开，外部 fetch 将被浏览器阻止。将强制使用模拟数据。建议使用本地服务器，例如: npx serve 或 python -m http.server');
+        }
+    })();
+    // ===== 临时调试：图表全部不显示时的诊断与重试 =====
+    (function debugCharts(){
+        function logStatus(){
+            console.group('%c[ChartDebug] 状态快照','color:#4fc3f7');
+            console.log('Chart.js 存在?', !!window.Chart);
+            console.log('ChartManager 实例?', !!window.chartManager);
+            const ids=['source-chart','density-chart','species-impact-chart','trend-chart','rubbish-yearly-chart','rubbish-city-chart','ocean-overview-chart','marine-bio-loss-chart','water-quality-chart'];
+            ids.forEach(id=>{
+                const el=document.getElementById(id);
+                console.log(id,'DOM',!!el,'尺寸', el? (el.clientWidth+'x'+el.clientHeight):'N/A');
+            });
+            if(window.chartManager){
+                Object.entries(window.chartManager.charts).forEach(([k,v])=>{
+                    console.log('实例',k, !!v, v && v.config && v.config.type);
+                });
+            }
+            console.groupEnd();
+        }
+        // 移除临时图表重建调试逻辑（已清理按钮）
+    })();
+    </script>
+    
+    <!-- 移除重复的手动多次地球创建脚本，统一由 globe.js 处理 -->
+    
+    <!-- 已移除 3D 地球相关脚本与快捷键逻辑 -->
+    <script>
+      // 监听生物减少图表 fallback 事件，显示生成按钮（保留原有功能）
+      document.addEventListener('marine-bio-loss-fallback', ()=>{
+          const wrap = document.getElementById('bio-loss-missing');
+          if(wrap){ wrap.style.display='block'; }
+      });
+      document.addEventListener('click', e=>{
+          if(e.target && e.target.id==='generate-bio-loss'){
+              alert('请在项目根目录运行: python data_simulated2.py\n生成完成后刷新页面。');
+          }
+      });
+    </script>
+    
+</body>
+</html>

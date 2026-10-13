@@ -1,0 +1,31 @@
+# 海洋塑料漂流模拟平台 - 依赖包清单
+# Ocean Plastic Drift Simulation Platform - Requirements
+
+# 核心依赖 - Core Dependencies
+streamlit>=1.28.0
+requests>=2.31.0
+pandas>=2.0.0
+numpy>=1.24.0
+
+# 地理数据处理 - Geospatial Data Processing
+geopandas>=0.13.0
+shapely>=2.0.0
+pyshp>=2.3.0
+folium>=0.14.0
+
+# 科学计算和数据分析 - Scientific Computing
+matplotlib>=3.7.0
+scipy>=1.11.0
+xarray>=2023.1.0
+netCDF4>=1.6.0
+h5netcdf>=1.1.0
+
+# 可选依赖 - Optional Dependencies (for enhanced features)
+pyogrio>=0.5.0
+plotly>=5.15.0
+seaborn>=0.12.0
+Pillow>=10.0.0
+
+# 开发和调试工具 - Development Tools
+pathlib-mate>=1.0.0
+click>=8.1.0

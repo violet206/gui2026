@@ -1,0 +1,39 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"/><title>预测实验室 · Prediction Lab</title><meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="stylesheet" href="styles.css"/><link rel="stylesheet" href="shared-ui.css"/><script src="utils.js"></script><style>body{margin:0;font-family:Roboto,Arial,sans-serif;height:100vh;display:flex;flex-direction:column;}header{flex:0 0 auto;display:flex;justify-content:space-between;align-items:center;padding:12px 18px}main{flex:1 1 auto;display:flex;min-height:0;padding:8px 10px 14px;gap:14px;} .grid{flex:1 1 auto;display:grid;grid-template-columns:320px 1fr;gap:14px;min-height:0;}@media (max-width:900px){ .grid{grid-template-columns:1fr;grid-auto-rows:minmax(260px,auto);} } .panel{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);padding:14px 16px;border-radius:16px;display:flex;flex-direction:column;min-height:0;}h3{margin:0 0 10px;font-size:15px}canvas{width:100%!important;height:100%!important}.chart-box{flex:1 1 auto;min-height:0;position:relative;display:flex;flex-direction:column;}#fallback{display:none;font-size:12px}#predChart{height:100%!important} .panel-controls{display:flex;flex-direction:column;gap:10px;flex:1 1 auto;overflow:auto;} .panel-controls label{margin-top:6px;} </style></head><body class="themed-page"><header class="frost-header"><div>📈 预测实验室</div><nav><a href="main.html" class="back-link small">← 返回主页面</a></nav></header><main>
+<div class="grid">
+  <div class="panel">
+  <h3 style="font-size:18px;letter-spacing:.5px;">数据生成 & 选项</h3>
+    <div class="panel-controls">
+      <div>
+  <label style="font-size:14px;opacity:.9;font-weight:500;">年份范围 Years</label>
+        <input type="range" id="years" min="8" max="25" value="15" style="width:100%">
+  <span id="yearsVal" style="font-size:14px;font-weight:600;">15</span>
+      </div>
+      <div>
+  <label style="font-size:14px;opacity:.9;font-weight:500;">噪声幅度 Noise</label>
+        <input type="range" id="noise" min="2" max="30" value="10" style="width:100%">
+  <span id="noiseVal" style="font-size:14px;font-weight:600;">10</span>
+      </div>
+  <div><label style="font-size:14px"><input type="checkbox" id="policyFlag" checked> 启用政策变量 (示意)</label></div>
+  <button id="btnGen" style="margin-top:4px;padding:8px 16px;border-radius:18px;background:#0d3a50;color:#d5f2ff;border:1px solid #1d5a77;cursor:pointer;font-size:14px;">生成 / 回归</button>
+  <div id="regStats" style="font-size:13px;line-height:1.55;">等待...</div>
+    </div>
+  </div>
+  <div class="panel">
+    <h3>历史 + 预测 History & Forecast</h3>
+    <div class="chart-box"><canvas id="predChart"></canvas><div id="fallback">Chart.js 不可用，使用表格。</div></div>
+  </div>
+</div>
+</main>
+<script>
+const U=window.__UTILS__;
+const ysEl=years, noiseEl=noise;
+const updateLabels=()=>{ yearsVal.textContent=ysEl.value; noiseVal.textContent=noiseEl.value; };
+ysEl.oninput=noise.oninput=function(){ updateLabels(); generate(); };
+updateLabels();
+document.getElementById('btnGen').onclick=generate;
+let chartInstance=null; async function generate(){ const n=+ysEl.value; const noise=+noiseEl.value; const withPolicy=policyFlag.checked; const yearsArr=[]; const base=[]; const policy=[]; for(let i=0;i<n;i++){ yearsArr.push(2010+i); const trend = 120 + i*5; const val = trend + (Math.random()-0.5)*noise; base.push(+val.toFixed(2)); policy.push( withPolicy? +(val * (0.95 - 0.01*i) ).toFixed(2) : +val.toFixed(2)); } const xs=yearsArr.map((y,i)=>i); const reg = U.linearRegression(xs, base); const futureYears=5; const forecast=[]; for(let j=1;j<=futureYears;j++){ const x=n-1 + j; forecast.push({ year: yearsArr[yearsArr.length-1]+j, value: reg.predict(x) }); }
+  renderStats(reg, base, forecast); if(!await U.ensureChartJS()){ renderFallback(yearsArr, base, forecast); return; } const ctx=document.getElementById('predChart').getContext('2d'); if(chartInstance) chartInstance.destroy(); chartInstance=new Chart(ctx,{ type:'line', data:{ labels: yearsArr.concat(forecast.map(f=>f.year)), datasets:[ {label:'历史值', data: base.concat(Array(forecast.length).fill(null)), borderColor:'#4cc9f0', tension:.25}, {label:'政策情景', data: policy.concat(Array(forecast.length).fill(null)), borderColor:'#ffb703', tension:.25}, {label:'线性预测', data: yearsArr.map((_,i)=> reg.predict(i)).concat(forecast.map(f=> f.value )), borderColor:'#f72585', borderDash:[4,4], tension:.25 } ] }, options:{ plugins:{legend:{labels:{color:'#def'}}}, scales:{x:{ticks:{color:'#9ec3d6'}},y:{ticks:{color:'#9ec3d6'}}}} }); }
+function renderStats(reg, base, forecast){ const residuals=base.map((v,i)=> v - reg.predict(i)); const mse = residuals.reduce((a,b)=>a+b*b,0)/residuals.length; regStats.innerHTML=`斜率 slope: <b>${reg.m.toFixed(3)}</b><br>截距 intercept: <b>${reg.b.toFixed(2)}</b><br>MSE: <b>${mse.toFixed(3)}</b><br>未来${forecast.length}年预测(示例): ${forecast.map(f=>f.value.toFixed(1)).join(', ')}`; }
+function renderFallback(yearsArr, base, forecast){ const fb=document.getElementById('fallback'); fb.style.display='block'; fb.innerHTML='<table class="basic"><tr><th>Year</th><th>Value</th></tr>'+ yearsArr.map((y,i)=>`<tr><td>${y}</td><td>${base[i]}</td></tr>`).join('') + forecast.map(f=>`<tr><td>${f.year}</td><td>${f.value.toFixed(2)}</td></tr>`).join('') + '</table>'; }
+generate();
+</script></body></html>

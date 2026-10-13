@@ -1,0 +1,267 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>轨迹播放器</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    html,body,#map{height:100%;margin:0;padding:0}
+    .leaflet-popup-content-wrapper{font-size:14px}
+    
+    /* 液体玻璃风格样式 */
+    :root {
+      --glass-bg: rgba(255, 255, 255, 0.1);
+      --glass-bg-hover: rgba(255, 255, 255, 0.15);
+      --glass-border: rgba(255, 255, 255, 0.15);
+      --glass-border-hover: rgba(255, 255, 255, 0.3);
+      --backdrop-filter: blur(12px);
+      --text-primary: rgba(255, 255, 255, 0.95);
+      --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    body {
+      background: linear-gradient(135deg, #0a1a2e 0%, #16213e 25%, #0f4c75 50%, #16213e 75%, #0a1a2e 100%);
+    }
+    
+    /* 返回主页按钮 */
+    .home-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 2000;
+      background: var(--glass-bg);
+      backdrop-filter: var(--backdrop-filter);
+      border: 1px solid var(--glass-border);
+      border-radius: 50px;
+      color: var(--text-primary);
+      padding: 12px 24px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+    
+    .home-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+    
+    .home-btn:hover::before {
+      left: 100%;
+    }
+    
+    .home-btn:hover {
+      background: var(--glass-bg-hover);
+      border-color: var(--glass-border-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+    }
+    
+    .home-btn:active {
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+<!-- 返回主页按钮 -->
+<a href="../main.html" class="home-btn">
+  🏠 返回主页
+</a>
+
+<div style="display:flex;flex-direction:column;height:100%">
+  <div style="padding:6px;background:#fff;z-index:1000;">
+    <button id="btnPlay">Play</button>
+    <button id="btnPause">Pause</button>
+    Speed: <input id="speed" type="range" min="0.25" max="4" step="0.25" value="1">
+    <span id="speedVal">1.0x</span>
+    Time: <input id="scrub" type="range" min="0" max="0" value="0" style="width:300px">
+    <span id="timeLabel">0</span>
+    <span id="status" style="margin-left:12px;color:#666"></span>
+  </div>
+  <div id="map" style="flex:1"></div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+  (function(){
+    const MAP_CENTER = [31.0, 121.0];
+    const POLL_MS = 1000; // fetch interval for data (ms)
+    const INTERVAL_MS = 200; // playback tick base (ms)
+
+  const map = L.map('map', {zoomControl:true}).setView(MAP_CENTER, 7);
+    // 优先使用高德瓦片，失败后回退到 OSM
+    const gaode = L.tileLayer(
+      'http://127.0.0.1:8001/gaode/{z}/{x}/{y}.png',
+      {maxZoom:18, attribution:'© 高德(缓存)'}
+    );
+    const osm = L.tileLayer(
+      'http://127.0.0.1:8001/osm/{z}/{x}/{y}.png',
+      {maxZoom:19, attribution:'© OSM(缓存)'}
+    );
+    // 远程备用图层（仅在缓存失败时尝试）
+    const gaodeDirect = L.tileLayer(
+      'https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=7&x={x}&y={y}&z={z}',
+      {subdomains:['1','2','3','4'], maxZoom:18, attribution:'© 高德'}
+    );
+    const osmDirect = L.tileLayer(
+      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      {maxZoom:19, attribution:'© OpenStreetMap'}
+    );
+    let baseAdded = false;
+    function addGaode(){
+      if(baseAdded) return; baseAdded=true; gaode.addTo(map); }
+    function addOSM(){
+      if(baseAdded) return; baseAdded=true; osm.addTo(map); }
+    function fallback(){
+      if(!baseAdded){ try{ gaodeDirect.addTo(map); baseAdded=true; }catch(e){ /* ignore */ } }
+      if(!baseAdded){ try{ osmDirect.addTo(map); baseAdded=true; }catch(e){ /* ignore */ } }
+    }
+    gaode.on('tileerror', function(){ addOSM(); fallback(); });
+    try{ addGaode(); }catch(e){ addOSM(); fallback(); }
+
+    let dataById = {}; // id -> [{lat,lng}, ...]
+    let ids = [];
+    let maxSteps = 0;
+    let currentStep = 0;
+    let playing = true;
+    let speed = 1.0;
+
+    const polylines = {};
+    const markers = {};
+
+    const btnPlay = document.getElementById('btnPlay');
+    const btnPause = document.getElementById('btnPause');
+    const speedEl = document.getElementById('speed');
+    const speedVal = document.getElementById('speedVal');
+    const scrub = document.getElementById('scrub');
+    const timeLabel = document.getElementById('timeLabel');
+    const status = document.getElementById('status');
+
+    btnPlay.onclick = ()=>{ playing = true; status.textContent = 'playing'; };
+    btnPause.onclick = ()=>{ playing = false; status.textContent = 'paused'; };
+    speedEl.oninput = ()=>{ speed = parseFloat(speedEl.value); speedVal.textContent = speed.toFixed(2)+'x'; };
+    scrub.oninput = ()=>{ currentStep = parseInt(scrub.value); renderAtStep(currentStep); };
+
+    function setStatus(txt){ status.textContent = txt; }
+
+    function safeGet(arr, i){ return (i>=0 && i < arr.length) ? arr[i] : null; }
+
+    function renderAtStep(t){
+      timeLabel.textContent = t;
+      // update polylines and markers for each id
+      ids.forEach(id=>{
+        const traj = dataById[id] || [];
+        const pts = traj.slice(0, Math.min(traj.length, t+1)).map(p=>[p.lat, p.lng]);
+        if(!polylines[id]){ polylines[id] = L.polyline(pts, {color:'#3388ff', weight:2, opacity:0.7}).addTo(map); }
+        else { polylines[id].setLatLngs(pts); }
+        const last = safeGet(traj, Math.min(t, traj.length-1));
+        if(last){
+          if(!markers[id]){ markers[id] = L.circleMarker([last.lat, last.lng], {radius:5, color:'#ff3300', fill:true}).addTo(map); }
+          else { markers[id].setLatLng([last.lat, last.lng]); }
+        }
+      });
+    }
+
+    async function fetchData(){
+      const endpoints = [
+        'http://127.0.0.1:8001/tracks.geojson', // 本地缓存服务
+        '/tracks.geojson',                      // 同源根路径
+        'tracks.geojson'                        // 相对路径
+      ];
+      let lastErr = null;
+      for(const url of endpoints){
+        try{
+          setStatus('fetch '+url);
+          const res = await fetch(url, {cache:'no-store'});
+            if(!res.ok){ lastErr = 'HTTP '+res.status; continue; }
+            const ct = res.headers.get('content-type') || '';
+            const text = await res.text();
+            if(text.length && text[0] === '<'){ lastErr = 'HTML received'; continue; }
+            let geo; try { geo = JSON.parse(text); } catch(parseE){ lastErr='JSON parse'; continue; }
+            if(!geo || !geo.features){ lastErr='no features'; continue; }
+            const newData = {};
+            geo.features.forEach(feat=>{
+              const id = feat.properties && feat.properties.id != null ? String(feat.properties.id) : null;
+              if(id==null) return;
+              const coords = (feat.geometry && feat.geometry.coordinates) ? feat.geometry.coordinates.map(c=>({lng:c[0], lat:c[1]})) : [];
+              newData[id] = coords;
+            });
+            dataById = newData;
+            ids = Object.keys(dataById);
+            maxSteps = ids.reduce((m,id)=>Math.max(m, (dataById[id]||[]).length), 0);
+            scrub.max = Math.max(0, maxSteps-1);
+            if(currentStep >= maxSteps) currentStep = Math.max(0, maxSteps-1);
+            renderAtStep(currentStep);
+            setStatus('ready '+ids.length+' ids '+maxSteps+' steps');
+            return; // success
+        }catch(e){
+          lastErr = e.message || 'error';
+        }
+      }
+      setStatus('fetch failed: '+lastErr);
+    }
+
+    // playback loop
+    let lastTick = performance.now();
+    function tick(now){
+      const dt = now - lastTick;
+      if(playing && maxSteps>0){
+        // advance based on speed and INTERVAL_MS
+        const advance = (dt / INTERVAL_MS) * speed;
+        if(advance >= 1){
+          currentStep = Math.min(maxSteps-1, currentStep + Math.floor(advance));
+          lastTick = now;
+          scrub.value = currentStep;
+          renderAtStep(currentStep);
+        }
+      } else {
+        lastTick = now;
+      }
+      requestAnimationFrame(tick);
+    }
+
+    // 如果内联模式注入了 INITIAL_GEOJSON，先同步加载
+    if(window.INITIAL_GEOJSON){
+      try{
+        const geo = window.INITIAL_GEOJSON;
+        const newData = {};
+        (geo.features||[]).forEach(feat=>{
+          const id = feat.properties && feat.properties.id != null ? String(feat.properties.id) : null;
+          if(id==null) return;
+            const coords = (feat.geometry && feat.geometry.coordinates) ? feat.geometry.coordinates.map(c=>({lng:c[0], lat:c[1]})) : [];
+            newData[id] = coords;
+        });
+        dataById = newData;
+        ids = Object.keys(dataById);
+        maxSteps = ids.reduce((m,id)=>Math.max(m,(dataById[id]||[]).length),0);
+        scrub.max = Math.max(0,maxSteps-1);
+        renderAtStep(0);
+        // 若有第一条 track 的第一个点，调整中心
+        if(ids.length>0 && dataById[ids[0]] && dataById[ids[0]][0]){
+          const p0 = dataById[ids[0]][0];
+          map.setView([p0.lat, p0.lng], 8);
+        }
+        setStatus('initial ready '+ids.length+' ids');
+      }catch(e){ console.warn('INITIAL_GEOJSON parse fail', e); }
+    }
+
+    // 后续轮询获取最新
+    fetchData();
+    setInterval(fetchData, POLL_MS);
+    requestAnimationFrame(tick);
+  })();
+  </script>
+</body>
+</html>

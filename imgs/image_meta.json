@@ -1,0 +1,340 @@
+[
+  {
+    "query": "3D texture map of Earth globe for THREE.js rendering, realistic satellite view with blue oceans, seamless texture",
+    "image_info": {
+      "url": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgclfTNkUcsfC0c2bVoKVjELv2pki_YYLCSD99BpC5IfzU9W9sH6kG7JcF07c6bxsVD4LnAH2PDkUQrN24mT_uedwjGm6onOmAJNMRbptuzkgAXqsTVFbFB4W6XkPaGuwDpflBf6ULJQhKs/s1600/1.jpg",
+      "file_path": "/workspace/imgs/earth-globe-satellite-texture-map-seamless.jpg",
+      "img_format": "JPEG",
+      "mode": "RGB",
+      "file_size": 137959,
+      "width": 1280,
+      "height": 512,
+      "total_pixels": 655360,
+      "basic_score": 0.8449558505767145
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 100.0,
+      "clarity_score": 95.0,
+      "watermark_score": 100.0,
+      "overall_score": 98.0,
+      "explanation": "The image perfectly matches the search query and prompt, depicting a realistic, seamless satellite view of the entire Earth with blue oceans, suitable for use as a 3D texture map in applications like THREE.js. The clarity is excellent, and there are no visible watermarks.",
+      "file_name": "earth-globe-satellite-texture-map-seamless.jpg",
+      "caption": "A high-resolution, seamless satellite view texture map of the entire Earth, showcasing realistic landmasses and blue oceans, ideal for 3D globe rendering applications like THREE.js.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "3D texture map of Earth globe for THREE.js rendering, realistic satellite view with blue oceans, seamless texture",
+    "image_info": {
+      "url": "https://media.istockphoto.com/id/182058785/photo/world-topographic-map.jpg?s=612x612&w=0&k=20&c=eWrcGjNB9o-KrzW4TC2yxUII7k5E26QIqlN3JEJu1e4=",
+      "file_path": "/workspace/imgs/realistic_earth_globe_texture_map_seamless_satellite.jpg",
+      "img_format": "JPEG",
+      "mode": "RGB",
+      "file_size": 41263,
+      "width": 612,
+      "height": 306,
+      "total_pixels": 187272,
+      "basic_score": 0.7320052462803515
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 100.0,
+      "clarity_score": 95.0,
+      "watermark_score": 100.0,
+      "overall_score": 98.0,
+      "explanation": "The image perfectly matches the search query and prompt. It is a high-quality, realistic, seamless Earth texture map with blue oceans, ideal for 3D rendering as specified. There are no watermarks, and the clarity is excellent.",
+      "file_name": "realistic_earth_globe_texture_map_seamless_satellite.jpg",
+      "caption": "A high-resolution, seamless equirectangular texture map of the Earth, presenting a realistic satellite view. The landmasses display varied terrain with shades of green, yellow, and brown, indicating vegetation and deserts/mountains, while the oceans are depicted in various shades of blue to show bathymetry. This detailed map is ideal for 3D rendering applications, such as creating an Earth globe in environments like THREE.js.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "3D texture map of Earth globe for THREE.js rendering, realistic satellite view with blue oceans, seamless texture",
+    "image_info": {
+      "url": "https://media.istockphoto.com/id/172208211/photo/earth-map-with-clouds.jpg?s=612x612&w=0&k=20&c=zG2Kh28E2UiW_GdlhE75McrrEFSpH8OGuJKI4zcZW9I=",
+      "file_path": "/workspace/imgs/earth_3d_texture_map_satellite_seamless_globe.jpg",
+      "img_format": "JPEG",
+      "mode": "RGB",
+      "file_size": 69850,
+      "width": 612,
+      "height": 306,
+      "total_pixels": 187272,
+      "basic_score": 0.7369038343298148
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 95.0,
+      "clarity_score": 90.0,
+      "watermark_score": 100.0,
+      "overall_score": 92.0,
+      "explanation": "The image perfectly aligns with the search query and prompt, serving as a realistic, seamless Earth texture map from a satellite view, ideal for 3D rendering. It exhibits excellent clarity, vibrant colors, and contains no watermarks.",
+      "file_name": "earth_3d_texture_map_satellite_seamless_globe.jpg",
+      "caption": "A high-resolution, full-Earth texture map rendered from composite satellite imagery, showcasing realistic landmasses with varied vegetation (green for forests, yellow/brown for deserts), vibrant blue oceans, and detailed white cloud patterns. The map is designed as a seamless, panoramic image, ideal for use as a 3D globe texture in rendering environments like THREE.js, providing a comprehensive and accurate representation of the planet's surface from space.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "A deep blue ocean abstract background with dark gradients, high contrast, scientific visualization style",
+    "image_info": {
+      "url": "https://static.vecteezy.com/system/resources/previews/060/457/813/non_2x/deep-blue-sea-gradient-background-abstract-dark-navy-underwater-wallpaper-blurred-ocean-backdrop-for-template-presentation-banner-brochure-poster-deep-water-or-night-sky-concept-design-vector.jpg",
+      "file_path": "/workspace/imgs/deep_blue_ocean_gradient_abstract_background_scientific.jpg",
+      "img_format": "JPEG",
+      "mode": "RGB",
+      "file_size": 25518,
+      "width": 1920,
+      "height": 698,
+      "total_pixels": 1340160,
+      "basic_score": 0.8327681868672528
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 95.0,
+      "clarity_score": 100.0,
+      "watermark_score": 100.0,
+      "overall_score": 95.0,
+      "explanation": "The image is highly relevant, perfectly matching the 'deep blue ocean gradient background dark navy' search query and the prompt's description of a 'deep blue ocean abstract background with dark gradients.' Its clarity is perfect for a smooth gradient, and it contains no watermarks. The high contrast and smooth transition evoke a clean, scientific visualization style, making the overall quality excellent for the intended use.",
+      "file_name": "deep_blue_ocean_gradient_abstract_background_scientific.jpg",
+      "caption": "A striking vertical abstract background featuring a smooth color gradient that transitions from a bright, almost white light blue at the top, through various shades of vibrant azure, to a very deep, dark navy blue at the bottom. The seamless blend and high contrast create a sense of vast depth, reminiscent of a deep ocean or a modern scientific visualization.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "A deep blue ocean abstract background with dark gradients, high contrast, scientific visualization style",
+    "image_info": {
+      "url": "https://static.vecteezy.com/system/resources/previews/060/603/371/non_2x/deep-blue-ocean-gradient-wallpaper-abstract-dark-navy-underwater-background-blurred-sea-backdrop-for-presentation-banner-brochure-poster-deep-water-or-night-sky-concept-design-vector.jpg",
+      "file_path": "/workspace/imgs/deep_blue_ocean_gradient_abstract_background_navy.jpg",
+      "img_format": "JPEG",
+      "mode": "RGB",
+      "file_size": 18184,
+      "width": 1920,
+      "height": 698,
+      "total_pixels": 1340160,
+      "basic_score": 0.8320314890941971
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 95.0,
+      "clarity_score": 95.0,
+      "watermark_score": 100.0,
+      "overall_score": 90.0,
+      "explanation": "The image is highly relevant to both the search query and prompt, featuring deep blue and dark navy gradients that evoke an ocean or scientific visualization style. It boasts excellent clarity with smooth transitions and no visible watermarks, making it a high-quality abstract background.",
+      "file_name": "deep_blue_ocean_gradient_abstract_background_navy.jpg",
+      "caption": "An abstract background featuring a dynamic swirl of deep, vibrant blue, transitioning smoothly into darker navy and almost black gradients. The composition evokes the profound depths of the ocean or a high-contrast scientific visualization, with soft light fall-off and a rich color palette.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "A deep blue ocean abstract background with dark gradients, high contrast, scientific visualization style",
+    "image_info": {
+      "url": "https://images.stockcake.com/public/4/f/0/4f0ae5c7-cfa0-4e05-9483-8d8615288905_large/deep-blue-gradient-stockcake.jpg",
+      "file_path": "/workspace/imgs/deep_blue_ocean_light_rays_gradient_background.jpg",
+      "img_format": "JPEG",
+      "mode": "RGB",
+      "file_size": 9241,
+      "width": 512,
+      "height": 512,
+      "total_pixels": 262144,
+      "basic_score": 0.7697133574446832
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 98.0,
+      "clarity_score": 90.0,
+      "watermark_score": 100.0,
+      "overall_score": 95.0,
+      "explanation": "The image perfectly aligns with the search query and prompt, showcasing a deep blue abstract ocean background with strong gradients and high-contrast light rays, fitting a scientific visualization aesthetic. It's clear, high-quality, and free of watermarks.",
+      "file_name": "deep_blue_ocean_light_rays_gradient_background.jpg",
+      "caption": "A striking abstract background featuring deep, dark blue tones reminiscent of the ocean's depths, illuminated by strong, high-contrast light rays piercing through from the top. The image displays a smooth gradient from lighter, vivid blue at the top to darker, navy shades at the bottom, creating a sense of immense depth and a scientific visualization style.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "A deep blue ocean abstract background with dark gradients, high contrast, scientific visualization style",
+    "image_info": {
+      "url": "https://media.istockphoto.com/id/1216628493/photo/dark-blue-de-focused-blurred-motion-abstract-background.jpg?s=612x612&w=0&k=20&c=05Tj4HnPzXDlAQl-UIc39zXVxs_W79HHwBPJz-AFJhE=",
+      "file_path": "/workspace/imgs/deep-blue-ocean-gradient-abstract-background.jpg",
+      "img_format": "JPEG",
+      "mode": "RGB",
+      "file_size": 7540,
+      "width": 612,
+      "height": 459,
+      "total_pixels": 280908,
+      "basic_score": 0.7753093366673665
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 90.0,
+      "clarity_score": 100.0,
+      "watermark_score": 100.0,
+      "overall_score": 95.0,
+      "explanation": "The image is highly relevant, perfectly matching the 'deep blue', 'dark navy', 'gradient background', 'abstract background', and 'dark gradients' aspects of the query and prompt. It also exhibits high contrast. The 'ocean' feel is well-implied by the deep blue tones. The only minor deviation is the 'scientific visualization style', which is less evident in a smooth, atmospheric gradient, but this is a very strong match for the primary color and gradient requirements.",
+      "file_name": "deep-blue-ocean-gradient-abstract-background.jpg",
+      "caption": "An abstract deep blue gradient background featuring a soft spotlight effect in the upper left transitioning smoothly into a dark navy and near-black shade towards the bottom and right edges, evoking the depth of the ocean with high contrast and a subtle atmospheric quality.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "A deep blue ocean abstract background with dark gradients, high contrast, scientific visualization style",
+    "image_info": {
+      "url": "https://img.freepik.com/free-photo/beautiful-photo-sea-sky_58702-11546.jpg?semt=ais_incoming&w=740&q=80",
+      "file_path": "/workspace/imgs/deep_blue_dark_ocean_gradient_background.jpg",
+      "img_format": "JPEG",
+      "mode": "RGB",
+      "file_size": 15891,
+      "width": 740,
+      "height": 494,
+      "total_pixels": 365560,
+      "basic_score": 0.8058773528497318
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 70.0,
+      "clarity_score": 95.0,
+      "watermark_score": 100.0,
+      "overall_score": 85.0,
+      "explanation": "The image effectively captures a deep blue, dark navy water surface with a subtle gradient, making it relevant to the search query and parts of the prompt like 'deep blue ocean abstract background with dark gradients'. However, it significantly lacks 'high contrast' as requested in the prompt, appearing quite monochromatic and subdued. The 'scientific visualization style' is also not strongly present. The clarity is excellent, and there are no watermarks. Overall, it's a high-quality abstract background, but deviates on specific stylistic requests.",
+      "file_name": "deep_blue_dark_ocean_gradient_background.jpg",
+      "caption": "An abstract close-up photograph of a deep blue water surface, transitioning to a dark navy or almost black tone at the bottom. The image features subtle, undulating ripples across its texture, creating a serene and mysterious gradient background. The dark, rich hues evoke the depths of the ocean.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "Marine plastic pollution icons and symbols in white on deep blue, professional infographic style",
+    "image_info": {
+      "url": "https://img.freepik.com/free-vector/hand-drawn-ocean-plastic-pollution-infographic_23-2150378125.jpg?semt=ais_hybrid&w=740&q=80",
+      "file_path": "/workspace/imgs/ocean_plastic_pollution_infographic_icons_deep_blue.jpg",
+      "img_format": "JPEG",
+      "mode": "RGB",
+      "file_size": 65905,
+      "width": 740,
+      "height": 740,
+      "total_pixels": 547600,
+      "basic_score": 0.8647637936899075
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 100.0,
+      "clarity_score": 95.0,
+      "watermark_score": 100.0,
+      "overall_score": 95.0,
+      "explanation": "The image is an excellent match for the search query and prompt. It clearly depicts ocean plastic pollution in a professional infographic style, featuring various marine plastic pollution icons and symbols in a white-on-deep-blue color scheme. The clarity is very good, with sharp visuals and legible text, though it contains placeholder 'Lorem ipsum' content, which is typical for style examples.",
+      "file_name": "ocean_plastic_pollution_infographic_icons_deep_blue.jpg",
+      "caption": "A professional infographic illustrating 'Ocean Plastics Pollution' with a dark teal and light blue color palette. The left side features a large net overflowing with various plastic waste, underneath which is the text '8 Million tons of plastics'. The right side details specific types of plastic pollution with accompanying icons: 'Plastic Bottles' (25%), 'Plastic Glass' (15%), 'Food Packaging' (10%), and 'Plastic Bag' (50%), each with placeholder descriptive text. The bottom of the infographic shows a submerged ocean floor with silhouetted fish and scattered plastic debris.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "Marine plastic pollution icons and symbols in white on deep blue, professional infographic style",
+    "image_info": {
+      "url": "https://cdn.venngage.com/template/thumbnail/full/e36a6089-baac-476b-ab75-3c47ace54319.webp",
+      "file_path": "/workspace/imgs/ocean_plastic_pollution_infographic_marine_waste_statistics.jpg",
+      "img_format": "WEBP",
+      "mode": "RGB",
+      "file_size": 100382,
+      "width": 816,
+      "height": 1056,
+      "total_pixels": 861696,
+      "basic_score": 0.9178481978851311
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 92.0,
+      "clarity_score": 95.0,
+      "watermark_score": 100.0,
+      "overall_score": 85.0,
+      "explanation": "The image is highly relevant to ocean plastic pollution and is presented in a clear, professional infographic style with a deep blue background. It includes various icons and a bar chart detailing pollution types. While the prompt specified 'icons in white', the icons in the image are multi-colored. However, the overall quality, clarity, and thematic relevance are very high.",
+      "file_name": "ocean_plastic_pollution_infographic_marine_waste_statistics.jpg",
+      "caption": "An informative infographic titled 'Ocean Pollution: A Global Crisis Threatening Marine Ecosystems' featuring a deep blue background. The upper section illustrates various marine life (fish, starfish) interacting with plastic waste icons (plastic bag, bottle, container, fork, spoon, rope) with a speech bubble saying '#SaveOurOceans'. The lower section presents a bar chart titled 'The Primary Types of Ocean Pollution and Waste That Are Currently Present in Aquatic Ecosystems,' showing percentages for Plastic Bags (14.1%), Plastic Bottles (11.9%), Food Containers/Utensils (9.4%), Synthetic Rope (7.9%), and Plastic Caps/Lids (6.1%). The source is attributed to Statista and 'www.SaveOurOceans.com'.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "Marine plastic pollution icons and symbols in white on deep blue, professional infographic style",
+    "image_info": {
+      "url": "https://img.freepik.com/free-vector/hand-drawn-ocean-plastic-pollution-infographic_23-2150404129.jpg",
+      "file_path": "/workspace/imgs/ocean_plastic_pollution_infographic_icons_marine_waste_illustration.jpg",
+      "img_format": "JPEG",
+      "mode": "RGB",
+      "file_size": 72412,
+      "width": 626,
+      "height": 626,
+      "total_pixels": 391876,
+      "basic_score": 0.8224036772532798
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 98.0,
+      "clarity_score": 100.0,
+      "watermark_score": 100.0,
+      "overall_score": 93.0,
+      "explanation": "The image is an extremely relevant and professionally designed infographic about ocean plastic pollution, aligning well with the search query and prompt. It features clear icons, charts, and text, presented in a clean, professional style with a cohesive blue color palette. While most marine life icons are white on deep blue as requested, some plastic-related icons use different shades of blue on blue backgrounds, a minor deviation. The image is perfectly clear and free of watermarks.",
+      "file_name": "ocean_plastic_pollution_infographic_icons_marine_waste_illustration.jpg",
+      "caption": "A professional infographic titled 'OCEAN PLASTIC POLLUTION' displayed in various shades of blue and white. The infographic details various aspects of marine plastic pollution, featuring a '19%' statistic, a bar chart showing trends from 2019-2023, and placeholder descriptive text. It includes several illustrative icons such as stacked plastic bottles, a plastic cup, a plastic bag, a water bottle, a fork and spoon, a dead fish, a jellyfish, a seashell, and a seahorse, many of which are depicted in white against darker blue backgrounds.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "Dynamic flowing white lines on dark navy background, tailing effect like ocean currents, abstract digital art",
+    "image_info": {
+      "url": "https://static.vecteezy.com/system/resources/thumbnails/043/425/572/large/abstract-background-with-light-white-curved-stripes-bright-neon-rays-and-glowing-curved-lines-glowing-trails-or-high-tech-particle-flow-video.jpg",
+      "file_path": "/workspace/imgs/dynamic_white_flowing_lines_abstract_black_background.jpg",
+      "img_format": "JPEG",
+      "mode": "L",
+      "file_size": 69900,
+      "width": 800,
+      "height": 450,
+      "total_pixels": 360000,
+      "basic_score": 0.8105886240624269
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 90.0,
+      "clarity_score": 100.0,
+      "watermark_score": 100.0,
+      "overall_score": 95.0,
+      "explanation": "The image is highly relevant to both the search query and the prompt, featuring dynamic white flowing lines and abstract particle trails. The clarity is excellent, and there are no watermarks. The only minor deviation is the background color, which is black instead of the requested dark navy.",
+      "file_name": "dynamic_white_flowing_lines_abstract_black_background.jpg",
+      "caption": "An abstract digital art image featuring dynamic, thin white lines that create a sense of flowing motion and particle trails against a solid black background. The lines on the left form a concentric swirling vortex, while on the right, they flow in curved, parallel paths, evoking the appearance of currents, wind patterns, or data streams.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "Data panel with marine pollution visualization in deep blue palette, rounded corner frame, professional style",
+    "image_info": {
+      "url": "https://community.fabric.microsoft.com/t5/image/serverpage/image-id/850301iC23A121942F67527?v=v2",
+      "file_path": "/workspace/imgs/modern_stacked_bar_chart_rounded_corners.jpg",
+      "img_format": "PNG",
+      "mode": "RGBA",
+      "file_size": 21073,
+      "width": 1345,
+      "height": 460,
+      "total_pixels": 618700,
+      "basic_score": 0.8082462490059531
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 70.0,
+      "clarity_score": 95.0,
+      "watermark_score": 100.0,
+      "overall_score": 90.0,
+      "explanation": "The image is a clear, professional data visualization with rounded corners on the bars, aligning well with the 'data visualization chart panel rounded corners' query and 'professional style' prompt. However, it does not depict 'marine pollution visualization' and the blue is not specifically a 'deep blue palette.' There is no 'rounded corner frame' around the overall chart, only the bars themselves have rounded corners.",
+      "file_name": "modern_stacked_bar_chart_rounded_corners.jpg",
+      "caption": "A clean and modern stacked bar chart data visualization featuring multiple vertical bars with rounded corners, rendered in a palette of bright blue, red, and light grey. The chart displays both positive and negative values relative to a central horizontal axis, with a subtle grid and 'h' (hours) labels on the y-axis (e.g., -2h, 0, 2h, 4h, 6h). The overall design is minimalist and professional, suitable for dashboards or reports.",
+      "recommend": true,
+      "error": ""
+    }
+  }
+]

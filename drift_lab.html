@@ -1,0 +1,83 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"/><title>漂流参数实验室 · Drift Lab</title><meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="stylesheet" href="styles.css"/><link rel="stylesheet" href="shared-ui.css"/><script src="utils.js"></script><style>
+body{font-family:Roboto,system-ui,Helvetica,Arial,sans-serif;}header{display:flex;align-items:center;justify-content:space-between;padding:10px 18px}
+.layout{max-width:1280px;margin:0 auto;padding:10px 18px 60px}.two-cols{display:grid;grid-template-columns:320px 1fr;gap:22px}.param-panel{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);padding:14px 18px;border-radius:14px}
+.param-panel h2{margin:0 0 10px;font-size:17px;letter-spacing:1px}
+.param-row label{width:90px;display:inline-block;font-size:12px;opacity:.85}
+.output-stats{margin-top:10px;font-size:12px;line-height:1.5;white-space:pre;font-family:ui-monospace,monospace}
+.toolbar button{background:#0b2e46;border:1px solid #1d5678;color:#bfeaff;padding:6px 14px;font-size:12px;border-radius:16px;cursor:pointer}
+.toolbar button:hover{background:#114260}
+</style></head><body class="themed-page">
+<header class="frost-header"><div>🌊 漂流参数实验室</div><nav><a class="back-link small" href="main.html">← 返回主页面</a></nav></header>
+<div class="layout">
+  <div class="two-cols">
+    <div class="param-panel" id="paramPanel">
+      <h2>参数 Parameters</h2>
+      <div class="param-row"><label>粒子数</label><input type="range" id="pCount" min="10" max="300" value="120"/><span id="pCountVal">120</span></div>
+      <div class="param-row"><label>步长 dt</label><input type="range" id="dt" min="0.2" max="4" step="0.1" value="1.0"/><span id="dtVal">1.0</span></div>
+      <div class="param-row"><label>扩散 Diff</label><input type="range" id="diff" min="0" max="2" step="0.05" value="0.6"/><span id="diffVal">0.6</span></div>
+      <div class="param-row"><label>漂移 DriftX</label><input type="range" id="dx" min="-1" max="1" step="0.05" value="0.2"/><span id="dxVal">0.2</span></div>
+      <div class="param-row"><label>漂移 DriftY</label><input type="range" id="dy" min="-1" max="1" step="0.05" value="0.05"/><span id="dyVal">0.05</span></div>
+      <div class="param-row"><label>噪声频率</label><input type="range" id="freq" min="0.2" max="3" step="0.1" value="1.2"/><span id="freqVal">1.2</span></div>
+      <div class="toolbar"><button id="btnRun">开始 / 暂停</button><button id="btnReset">重置</button><button id="btnExport">导出JSON</button></div>
+      <div class="output-stats" id="stats">等待运行...</div>
+    </div>
+    <div>
+      <canvas id="labCanvas" class="lab-canvas" width="860" height="520"></canvas>
+      <div class="card" style="margin-top:16px"><h3>说明</h3><p style="font-size:13px;line-height:1.5">此页面为纯前端快速实验：<br>• 不写入后端文件<br>• 仅展示局部 2D 平面坐标<br>• 真实模拟请进入 Streamlit 演示界面。</p></div>
+    </div>
+  </div>
+</div>
+<script src="dataService.js"></script>
+<script>
+const U = window.__UTILS__;
+const canvas = document.getElementById('labCanvas'); const ctx = canvas.getContext('2d');
+const sliders = ['pCount','dt','diff','dx','dy','freq']; const S={};
+sliders.forEach(id=>{ S[id]=document.getElementById(id); const v=document.getElementById(id+'Val'); S[id].addEventListener('input',()=>{ v.textContent=S[id].value; if(id==='pCount') resizeParticles(); }); v.textContent=S[id].value; });
+let particles=[]; function resizeParticles(){ const target=+S.pCount.value; if(particles.length>target) particles.length=target; else while(particles.length<target) particles.push({x:U.rand(0,canvas.width),y:U.rand(0,canvas.height)}); }
+resizeParticles();
+let running=false, frame=0; const statsEl=document.getElementById('stats');
+// === 洋流矢量场 (稀疏)  =====================================================
+let currentField=null; let fieldReady=false; let fieldMsg='加载洋流...';
+async function loadCurrents(){
+  try{
+    const res = await window.dataService.getOceanCurrentField();
+    if(!res || !res.data){ currentField=null; fieldMsg='洋流回退'; return; }
+    // ERDDAP OSCAR 结构: { table: { columns:["u","v"], rows:[...] } } 或 griddap JSON (此处用通用解析)
+    const json = res.data || res; // getOrFetch 返回 {data:json}
+    // 简化：寻找 u / v 数组 (可能位于 json.data 或 json.u)
+    // 若结构复杂，仅生成合成场
+    let vectors=[];
+    function pushVec(x,y,u,v){ if(!isFinite(u)||!isFinite(v)) return; vectors.push({x,y,u,v}); }
+    if(json && json.table && Array.isArray(json.table.rows)){
+       // rows: [[u,v], ...] 需要假设网格大小 (先简单前 400 行做 20x20)
+       const rows=json.table.rows.slice(0,400); const W=Math.floor(Math.sqrt(rows.length));
+       rows.forEach((r,i)=>{ const u=r[0], v=r[1]; const gx=i%W, gy=Math.floor(i/W); pushVec(gx,gy,u,v); });
+    } else if(json && json.u && json.v && Array.isArray(json.u.data)){
+       const Udat=json.u.data; const Vdat=json.v.data; const len=Math.min(Udat.length,Vdat.length,400);
+       for(let i=0;i<len;i++){ const gx=i%20, gy=Math.floor(i/20); pushVec(gx,gy,Udat[i],Vdat[i]); }
+    }
+    if(!vectors.length){ // fallback 合成旋涡
+       for(let gy=0;gy<20;gy++){ for(let gx=0;gx<20;gx++){ const dx=gx-10, dy=gy-10; const r=Math.sqrt(dx*dx+dy*dy)+0.1; pushVec(gx,gy, -dy/r*0.5, dx/r*0.5); } }
+       fieldMsg='洋流回退(合成)';
+    } else fieldMsg='洋流已加载';
+    currentField={vectors, W:20, H:20}; fieldReady=true;
+  }catch(e){ console.warn('[DriftLab] currents fail',e); fieldMsg='洋流失败(回退)'; currentField=null; }
+}
+setTimeout(loadCurrents, 800); // 延迟尝试，避免首屏阻塞
+function sampleCurrent(px,py){ if(!currentField||!fieldReady) return {u:0,v:0}; const {vectors}=currentField; // 将 canvas 坐标映射到网格
+  const gx=Math.floor(px/canvas.width*20); const gy=Math.floor(py/canvas.height*20); const idx=gy*20+gx; const vec=vectors[idx]; if(!vec) return {u:0,v:0}; return {u:vec.u||0,v:vec.v||0}; }
+function step(){ if(!running) return; frame++; const dt=parseFloat(S.dt.value); const diff=parseFloat(S.diff.value); const driftX=parseFloat(S.dx.value); const driftY=parseFloat(S.dy.value); const freq=parseFloat(S.freq.value);
+  const t = frame*0.01;
+  for(const p of particles){ const n = Math.sin((p.x+ t*120)*0.001*freq)+Math.cos((p.y - t*60)*0.001*freq); const cur = sampleCurrent(p.x,p.y); // 缩放洋流分量
+    p.x += driftX + n*0.4*dt + cur.u*1.2 + (Math.random()-0.5)*diff;
+    p.y += driftY + Math.sin(t+ p.x*0.002)*0.3*dt + cur.v*1.2 + (Math.random()-0.5)*diff;
+    if(p.x<0) p.x+=canvas.width; if(p.y<0) p.y+=canvas.height; if(p.x>canvas.width) p.x-=canvas.width; if(p.y>canvas.height) p.y-=canvas.height; }
+  render(); requestAnimationFrame(step);
+}
+function render(){ ctx.fillStyle='rgba(0,15,30,0.45)'; ctx.fillRect(0,0,canvas.width,canvas.height); ctx.fillStyle='#59d6ff'; for(const p of particles){ ctx.fillRect(p.x,p.y,2,2);} if(frame%12===0){ updateStats(); } }
+function updateStats(){ let cx=0,cy=0; for(const p of particles){ cx+=p.x; cy+=p.y; } cx/=particles.length; cy/=particles.length; let varR=0; for(const p of particles){ const dx=p.x-cx, dy=p.y-cy; varR+=Math.sqrt(dx*dx+dy*dy); } varR/=particles.length; statsEl.textContent=`粒子: ${particles.length}\n帧: ${frame}\n中心: ${cx.toFixed(1)}, ${cy.toFixed(1)}\n平均离散: ${varR.toFixed(2)}\n${fieldMsg}`; }
+document.getElementById('btnRun').onclick=()=>{ running=!running; if(running){ requestAnimationFrame(step); } };
+document.getElementById('btnReset').onclick=()=>{ frame=0; particles.forEach(p=>{ p.x=U.rand(0,canvas.width); p.y=U.rand(0,canvas.height); }); updateStats(); render(); };
+document.getElementById('btnExport').onclick=()=>{ const data={time:Date.now(), params: Object.fromEntries(sliders.map(k=>[k,S[k].value])), particles:particles.map(p=>({x:+p.x.toFixed(2),y:+p.y.toFixed(2)}))}; const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='drift_lab_export.json'; a.click(); URL.revokeObjectURL(a.href); };
+render();
+</script></body></html>

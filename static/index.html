@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>海洋塑料漂流轨迹回放</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    html,body,#map { height: 100%; margin: 0; padding: 0; }
+    #controls { position: absolute; top: 10px; left: 10px; z-index: 1000; background: rgba(255,255,255,0.9); padding: 8px; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
+    #playBtn { width: 60px; }
+    #timeLabel { margin-left: 8px; font-weight: bold; }
+    
+    /* 液体玻璃风格样式 */
+    :root {
+      --glass-bg: rgba(255, 255, 255, 0.1);
+      --glass-bg-hover: rgba(255, 255, 255, 0.15);
+      --glass-border: rgba(255, 255, 255, 0.15);
+      --glass-border-hover: rgba(255, 255, 255, 0.3);
+      --backdrop-filter: blur(12px);
+      --text-primary: rgba(255, 255, 255, 0.95);
+      --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    body {
+      background: linear-gradient(135deg, #0a1a2e 0%, #16213e 25%, #0f4c75 50%, #16213e 75%, #0a1a2e 100%);
+    }
+    
+    /* 返回主页按钮 */
+    .home-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 2000;
+      background: var(--glass-bg);
+      backdrop-filter: var(--backdrop-filter);
+      border: 1px solid var(--glass-border);
+      border-radius: 50px;
+      color: var(--text-primary);
+      padding: 12px 24px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+    
+    .home-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+    
+    .home-btn:hover::before {
+      left: 100%;
+    }
+    
+    .home-btn:hover {
+      background: var(--glass-bg-hover);
+      border-color: var(--glass-border-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+    }
+    
+    .home-btn:active {
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <!-- 返回主页按钮 -->
+  <a href="../main.html" class="home-btn">
+    🏠 返回主页
+  </a>
+  
+  <div id="map"></div>
+  <div id="controls">
+    <button id="playBtn">播放</button>
+    <input id="timeSlider" type="range" min="0" max="400" value="0" step="1" style="width:360px" />
+    <span id="timeLabel">t=0</span>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    // 简单的轨迹回放页面。要求 tracks.geojson 与 index.html 在同一目录（或通过 HTTP 同源）
+    const GEOJSON_URL = 'tracks.geojson';
+
+    const map = L.map('map').setView([31.0, 121.0], 7);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    let features = [];
+    let polylines = []; // 对应每个 feature 的 polyline
+    let maxPoints = 0;
+
+    // 加载 geojson
+    fetch(GEOJSON_URL).then(r => r.json()).then(data => {
+      features = data.features || [];
+      // 解析每条 feature 的坐标数组
+      features.forEach((f, idx) => {
+        const coords = f.geometry.coordinates.map(c => [c[1], c[0]]); // [lat, lon]
+        if (coords.length > maxPoints) maxPoints = coords.length;
+        // 先绘制空 polyline
+        const pl = L.polyline([], {color: getColor(idx), weight: 2, opacity: 0.8}).addTo(map);
+        polylines.push({ poly: pl, coords: coords });
+      });
+
+      // 缩放到所有轨迹范围
+      const allLatLngs = [].concat(...polylines.map(p => p.coords));
+      if (allLatLngs.length) map.fitBounds(allLatLngs);
+
+      // 更新滑块上限为 maxPoints-1
+      const slider = document.getElementById('timeSlider');
+      slider.max = Math.max(0, maxPoints - 1);
+      updateFromSlider();
+    }).catch(err => {
+      alert('加载 tracks.geojson 失败：请确保文件与 index.html 同目录并通过 HTTP 服务器访问。\n错误：' + err);
+      console.error(err);
+    });
+
+    function getColor(i) {
+      const colors = ['#e41a1c','#377eb8','#4daf4a','#984ea3','#ff7f00','#ffff33','#a65628','#f781bf','#999999'];
+      return colors[i % colors.length];
+    }
+
+    // 控制播放
+    let playing = false;
+    let timer = null;
+    const playBtn = document.getElementById('playBtn');
+    const slider = document.getElementById('timeSlider');
+    const timeLabel = document.getElementById('timeLabel');
+
+    playBtn.addEventListener('click', () => {
+      playing = !playing;
+      playBtn.textContent = playing ? '暂停' : '播放';
+      if (playing) startPlayback(); else stopPlayback();
+    });
+
+    slider.addEventListener('input', updateFromSlider);
+
+    function updateFromSlider() {
+      const t = parseInt(slider.value);
+      timeLabel.textContent = 't=' + t;
+      // 每条轨迹显示到第 t 个点
+      polylines.forEach(p => {
+        const coords = p.coords.slice(0, t+1);
+        p.poly.setLatLngs(coords);
+      });
+    }
+
+    function startPlayback() {
+      const fps = 10; // 每秒帧数
+      const stepMs = 1000 / fps;
+      timer = setInterval(() => {
+        const max = parseInt(slider.max);
+        let v = parseInt(slider.value);
+        if (v >= max) { stopPlayback(); return; }
+        v += 1;
+        slider.value = v;
+        updateFromSlider();
+      }, stepMs);
+    }
+
+    function stopPlayback() {
+      playing = false;
+      playBtn.textContent = '播放';
+      if (timer) { clearInterval(timer); timer = null; }
+    }
+
+    // 提示：直接用 file:// 打开会因为浏览器安全策略无法 fetch 本地文件，请使用本地 HTTP 服务器（README 中有说明）
+  </script>
+</body>
+</html>
