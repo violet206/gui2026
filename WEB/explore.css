@@ -1,0 +1,125 @@
+/* explore.css: 起始页简洁风格 */
+*{margin:0;padding:0;box-sizing:border-box;font-family:Roboto,Inter,system-ui,sans-serif;}
+body{background:linear-gradient(135deg,#061c2b 0%,#0f3447 55%,#143d52 100%);color:#e0fbfc;-webkit-font-smoothing:antialiased;overflow:hidden;display:flex;flex-direction:column;min-height:100vh;}
+/* 入口只使用透明度淡入，避免覆盖 tilt transform */
+.landing-body:not(.reveal) .landing-center{opacity:0;} 
+.landing-body.reveal .landing-center{transition:opacity .9s ease;} 
+.landing-body:not(.reveal) #music-toggle{opacity:0;transform:translateY(-8px);}
+.landing-body.reveal #music-toggle{transition:opacity .6s ease .15s,transform .55s ease .15s;}
+.bg-video{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;opacity:0;transition:opacity 1.2s ease;filter:brightness(.9) saturate(1.1);} .bg-video-ready{opacity:1;}
+#particle-canvas{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.25;}
+.landing-flex-wrap{flex:1;display:flex;align-items:center;justify-content:center;position:relative;padding:40px 26px 28px;}
+/* 移除自身 transform，tilt 由内联样式统一控制 */
+.landing-center{--hero-offset:0px;position:relative;width:min(880px,90%);padding:56px 54px 50px;background:rgba(255,255,255,0.06);border:1px solid rgba(168,218,220,.25);border-radius:28px;backdrop-filter:blur(22px) saturate(1.4);box-shadow:0 18px 48px -10px rgba(0,0,0,.55),0 4px 12px rgba(0,0,0,.35);text-align:center;}
+/* 提供不同场景类控制偏移量 */
+body.landing-body.hero-lower .landing-center{--hero-offset:60px;}
+body.landing-body.hero-higher .landing-center{--hero-offset:-40px;}
+.landing-title{font-size:clamp(1.9rem,4.2vw,3rem);letter-spacing:.06em;font-weight:600;margin:0 0 14px;background:linear-gradient(90deg,#d8f3fd,#78c6f7 40%,#ffe29f 80%);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.landing-subtitle{font-size:clamp(.9rem,1.3vw,1.15rem);font-weight:400;letter-spacing:.05em;margin-bottom:30px;color:#a8dadc;opacity:.9;}
+.landing-actions{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin-bottom:26px;}
+.enter-btn,.ghost-btn{position:relative;cursor:pointer;font-size:.95rem;letter-spacing:.06em;padding:14px 28px;border-radius:50px;border:1px solid rgba(168,218,220,.45);background:linear-gradient(135deg,rgba(120,198,247,.35),rgba(120,198,247,.10));color:#e8f9ff;font-weight:500;backdrop-filter:blur(8px);transition:background .35s,transform .25s,border-color .35s;}
+.ghost-btn{background:rgba(255,255,255,0.05);}
+.enter-btn:hover{background:linear-gradient(135deg,rgba(120,198,247,.55),rgba(120,198,247,.18));transform:translateY(-2px);} .ghost-btn:hover{background:rgba(255,255,255,.12);}
+.enter-btn:active,.ghost-btn:active{transform:translateY(1px);}
+.arrow{margin-left:4px;transition:transform .35s;display:inline-block;} .enter-btn:hover .arrow{transform:translateX(4px);}
+.tag{display:inline-block;padding:4px 10px;margin:2px 4px;font-size:11px;letter-spacing:.05em;color:#cce9f6;background:rgba(255,255,255,0.08);border:1px solid rgba(168,218,220,.25);border-radius:40px;backdrop-filter:blur(6px);}
+.meta-line{display:flex;flex-wrap:wrap;justify-content:center;margin-top:2px;margin-bottom:24px;}
+.landing-footer-note{font-size:11px;color:#89c2d9;opacity:.78;letter-spacing:.04em;}
+.site-label{margin-top:10px;font-size:10px;letter-spacing:.08em;color:#7fb8d1;opacity:.7;}
+.landing-footer{position:fixed;left:0;bottom:12px;width:100%;text-align:center;font-size:12px;color:#8fbcd1;letter-spacing:.05em;pointer-events:none;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;} }
+/* 响应式调整 */
+@media (max-width:640px){.landing-center{padding:42px 30px 38px;border-radius:22px;} .landing-actions{gap:14px;} .enter-btn,.ghost-btn{width:100%;} .landing-title{letter-spacing:.04em;} }
+/* 根据视窗高度自适应下移偏移，避免过低时被裁剪 */
+@media (max-height:780px){.landing-center{--hero-shiftY:calc(-50% + 48px);} }
+@media (max-height:680px){.landing-center{--hero-shiftY:calc(-50% + 32px);} }
+@media (max-height:620px){.landing-flex-wrap{align-items:flex-start;} .landing-center{margin-top:34px;margin-bottom:40px;} body{overflow:auto;} }
+/* 覆盖主站 styles.css 中 .glass-card 的浮动与 hover 位移，避免起始页卡片跟随鼠标微抖动 */
+body.landing-body .landing-center{animation:none!important;}
+body.landing-body .landing-center:hover{box-shadow:0 18px 48px -10px rgba(0,0,0,.55),0 4px 12px rgba(0,0,0,.35);}
+/* === 起始页英雄卡片 3D 倾斜支持 === */
+body.landing-body.tilt-active{perspective:1400px;perspective-origin:50% 50%;}
+body.landing-body.tilt-active .landing-center{transform-style:preserve-3d;transition:transform .18s ease, box-shadow .28s ease;}
+body.landing-body.tilt-active .landing-center.glare-active .card-glare{opacity:.55;}
+body.landing-body.tilt-active .landing-center .card-glare{position:absolute;inset:0;pointer-events:none;border-radius:inherit;background:radial-gradient(circle at 50% 50%,rgba(255,255,255,0.45),rgba(255,255,255,0.05) 42%,rgba(255,255,255,0) 72%);opacity:0;mix-blend-mode:screen;transition:opacity .35s ease, background .35s ease, transform .35s ease;}
+@media (prefers-reduced-motion: reduce){body.landing-body.tilt-active .landing-center{transition:none;}body.landing-body.tilt-active .landing-center .card-glare{transition:none;}}
+/* 关闭内部 pointer-events 对布局影响（保持常规） */
+body.landing-body .landing-center *{will-change:auto;}
+
+/* === 光标跟随柔和光斑 (纯背景层，不影响交互) === */
+#cursor-glow{position:fixed;top:0;left:0;width:420px;height:420px;pointer-events:none;z-index:-1;transform:translate(-50%,-50%) translate(50vw,50vh);background:radial-gradient(circle at center,rgba(120,198,247,0.55),rgba(120,198,247,0.28) 28%,rgba(120,198,247,0.12) 52%,rgba(120,198,247,0.04) 72%,rgba(120,198,247,0) 80%);filter:blur(42px) saturate(1.3);mix-blend-mode:screen;opacity:.55;transition:opacity .6s ease;}
+@media (max-width:680px){#cursor-glow{width:300px;height:300px;filter:blur(36px);opacity:.45;}}
+@media (prefers-reduced-motion: reduce){#cursor-glow{transition:none;}}
+
+/* === 进入主平台按钮延迟呼吸高亮 === */
+@keyframes slowBreathPulse{0%{box-shadow:0 0 0 0 rgba(120,198,247,0.55),0 0 18px -4px rgba(120,198,247,0.6);transform:translateY(0) scale(1);}50%{box-shadow:0 0 0 4px rgba(120,198,247,0.18),0 0 26px -2px rgba(120,198,247,0.75);transform:translateY(-2px) scale(1.025);}100%{box-shadow:0 0 0 0 rgba(120,198,247,0.55),0 0 18px -4px rgba(120,198,247,0.6);transform:translateY(0) scale(1);}}
+.enter-btn.auto-pulse{animation:slowBreathPulse 2.9s ease-in-out infinite;}
+@media (prefers-reduced-motion: reduce){.enter-btn.auto-pulse{animation:none;box-shadow:0 0 0 0 rgba(120,198,247,0.55),0 0 16px -4px rgba(120,198,247,0.6);} }
+
+/* 当用户交互后（脚本会移除 .auto-pulse），恢复正常 hover 逻辑 */
+.enter-btn.auto-pulse:hover{animation-play-state:paused;}
+
+/* === 英雄卡片内部浮层漂浮感 === */
+.floating-hero{position:relative;}
+.floating-hero .float-inner{display:inline-block;position:relative;z-index:2;}
+/* 给按钮内部独立可控层 */
+.floating-hero .float-inner-btn{display:inline-block;position:relative;z-index:3;}
+/* 水面薄雾感：利用伪元素在各浮层下方添加柔和高斯光晕 */
+.floating-hero .float-inner::after,.floating-hero .float-inner-btn::after{content:"";position:absolute;left:50%;top:50%;width:120%;height:120%;transform:translate(-50%,-50%);background:radial-gradient(circle at 50% 55%,rgba(255,255,255,0.25),rgba(120,198,247,0.18) 40%,rgba(120,198,247,0.06) 70%,rgba(120,198,247,0) 80%);filter:blur(18px);opacity:.55;pointer-events:none;mix-blend-mode:screen;transition:opacity .6s ease;}
+@media (max-width:640px){.floating-hero .float-inner::after,.floating-hero .float-inner-btn::after{filter:blur(14px);}}
+
+/* 漂浮动画：缓慢上下 + 轻微横向漂移 + 细微缩放呼吸 */
+@keyframes gentleFloat{
+	0%{transform:translateY(0) translateX(0) scale(1);}
+	25%{transform:translateY(-4px) translateX(2px) scale(1.008);}
+	50%{transform:translateY(0) translateX(0) scale(1);}
+	75%{transform:translateY(5px) translateX(-2px) scale(1.012);}
+	100%{transform:translateY(0) translateX(0) scale(1);}
+}
+/* 按钮单独稍快一点 */
+@keyframes gentleFloatBtn{
+	0%{transform:translateY(0) translateX(0) scale(1);}
+	25%{transform:translateY(-5px) translateX(3px) scale(1.02);}
+	50%{transform:translateY(0) translateX(0) scale(1);}
+	75%{transform:translateY(6px) translateX(-3px) scale(1.025);}
+	100%{transform:translateY(0) translateX(0) scale(1);}
+}
+
+.floating-hero .landing-title .float-inner{animation:gentleFloat 11s ease-in-out infinite;}
+.landing-title .float-inner{
+	background:linear-gradient(92deg,#e8fcff 0%,#b7ecff 35%,#7ec9ff 62%,#ffe3a1 95%);
+	-webkit-background-clip:text;
+	background-clip:text;
+	color:transparent;
+	-webkit-text-fill-color:transparent;
+	filter:drop-shadow(0 4px 14px rgba(120,198,247,.38)) drop-shadow(0 0 8px rgba(255,227,161,.25));
+}
+/* 避免标题被自身漂浮雾层覆盖 */
+h1.landing-title .float-inner::after{display:none;}
+.floating-hero .landing-subtitle .float-inner{animation:gentleFloat 13s ease-in-out infinite;}
+.floating-hero .landing-actions .float-inner{animation:gentleFloat 12s ease-in-out infinite;}
+.floating-hero .landing-actions .float-inner-btn{animation:gentleFloatBtn 9.5s ease-in-out infinite;}
+.floating-hero .meta-line .meta-float{animation:gentleFloat 15s ease-in-out infinite;}
+.floating-hero .landing-footer-note .float-inner{animation:gentleFloat 14s ease-in-out infinite;}
+
+/* 进入倾斜时保持动画但允许 transform 叠加：使用 transform-origin 与 will-change 优化 */
+.floating-hero .float-inner,.floating-hero .float-inner-btn{transform-origin:center center;will-change:transform;}
+/* 视差变量：JS 仅设置 --px --py --pz 不直接覆盖动画 transform */
+.floating-hero [data-depth]{--px:0px;--py:0px;--pz:0px;transform:translate3d(var(--px),var(--py),var(--pz)) var(--extra, translateZ(0));}
+
+/* 当倾斜交互激活时增强雾光透明度轻微呼吸 */
+@keyframes mistBreath{0%{opacity:.45;}50%{opacity:.62;}100%{opacity:.45;}}
+body.landing-body.tilt-active .floating-hero .float-inner::after,body.landing-body.tilt-active .floating-hero .float-inner-btn::after{animation:mistBreath 6.5s ease-in-out infinite;}
+
+/* Reduced Motion 降级：去除漂浮与雾光呼吸，仅保留静态高光 */
+@media (prefers-reduced-motion: reduce){
+	.floating-hero .landing-title .float-inner,
+	.floating-hero .landing-subtitle .float-inner,
+	.floating-hero .landing-actions .float-inner,
+	.floating-hero .landing-actions .float-inner-btn,
+	.floating-hero .meta-line .meta-float,
+	.floating-hero .landing-footer-note .float-inner{animation:none;}
+	body.landing-body.tilt-active .floating-hero .float-inner::after,body.landing-body.tilt-active .floating-hero .float-inner-btn::after{animation:none;opacity:.5;}
+}
+
+

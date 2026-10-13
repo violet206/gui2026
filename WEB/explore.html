@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>海洋塑料污染智能监测系统 | Ocean Plastic Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="shared-ui.css" />
+  <link rel="stylesheet" href="explore.css" />
+  <link rel="stylesheet" href="explore_new.css" />
+  <style>
+    /* 补充：将 3D 倾斜变量组合进基础居中位移，避免脚本覆盖 translate */
+  .landing-center{--rx:0deg;--ry:0deg;--scale:1;--hero-offset:0px;transform:perspective(1000px) rotateX(var(--rx)) rotateY(var(--ry)) scale(var(--scale)) translateY(var(--hero-offset));transform-style:preserve-3d;transform-origin:50% 50%;}
+  /* 取消 .glass-card 通用 :hover 位移对英雄卡片的覆盖 */
+  #hero-card.glass-card:hover{transform:perspective(1000px) rotateX(var(--rx)) rotateY(var(--ry)) scale(var(--scale)) translateY(var(--hero-offset));}
+    /* 音乐按钮统一玻璃风格 */
+    .music-btn{position:fixed;right:18px;top:18px;z-index:30;cursor:pointer;padding:8px 14px;font-size:12px;letter-spacing:.05em;border:1px solid rgba(168,218,220,.5);background:rgba(0,0,0,.35);color:#e0fbfc;border-radius:18px;backdrop-filter:blur(8px) saturate(1.4);-webkit-backdrop-filter:blur(8px) saturate(1.4);transition:background .25s,border-color .25s,opacity .35s;}
+    .music-btn:hover{background:rgba(255,255,255,0.12);border-color:rgba(168,218,220,.75);}  
+    .music-btn.muted{opacity:.6;}
+    .card-glare{position:absolute;inset:0;border-radius:inherit;pointer-events:none;mix-blend-mode:screen;opacity:0;transition:opacity .35s ease,background .35s ease;}
+  .landing-center.glare-active .card-glare{opacity:.55;}
+  /* 强化中文主标题可见性（重新定义渐变并添加轻薄发光） */
+  h1.landing-title{position:relative;z-index:5;background:linear-gradient(92deg,#e8fcff 0%,#b7ecff 35%,#7ec9ff 62%,#ffe3a1 95%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;filter:drop-shadow(0 4px 14px rgba(120,198,247,.38)) drop-shadow(0 0 8px rgba(255,227,161,.25));}
+  @supports not ((-webkit-background-clip:text) or (background-clip:text)){
+    h1.landing-title{color:#e8fcff;}
+  }
+  /* 根据倾斜动态阴影偏移（JS 设置 --shadow-x / --shadow-y） */
+  .landing-center{box-shadow:var(--shadow-x,0px) var(--shadow-y,0px) 48px -10px rgba(0,0,0,.55),0 4px 12px rgba(0,0,0,.35);}  
+  </style>
+  <script src="particles.js" defer></script>
+</head>
+<body class="landing-body">
+  <!-- 背景视频 -->
+  <video id="bg-video" class="bg-video" muted autoplay loop playsinline preload="auto" poster="imgs/deep_blue_ocean_gradient_abstract_background_scientific.jpg">
+    <source src="https://cdn.pixabay.com/video/2016/09/13/5200-183786525_large.mp4" type="video/mp4" />
+  </video>
+  <canvas id="particle-canvas"></canvas>
+  <!-- 背景音乐 -->
+  <audio id="bg-music" preload="auto" loop muted>
+    <source src="Kan R. Gao - For River - Piano (Johnny's Version).mp3" type="audio/mpeg" />
+    您的浏览器不支持音频播放 / Your browser does not support audio.
+  </audio>
+  <button id="music-toggle" class="music-btn muted" title="点击播放 / 暂停 背景音乐">♪ For River - Piano (Johnny's Version)</button>
+  <!-- 光标柔和光斑 -->
+  <div id="cursor-glow" aria-hidden="true"></div>
+
+  <!-- Flex 包裹层用于稳定居中 -->
+  <div class="landing-flex-wrap">
+  <main class="landing-center glass-card floating-hero" id="hero-card">
+    <div class="card-glare" id="card-glare"></div>
+  <h1 class="landing-title" data-depth="70"><span class="float-inner" data-depth="70">海洋塑料污染智能监测系统</span></h1>
+  <p class="landing-subtitle" data-depth="52"><span class="float-inner" data-depth="52">Multi‑source Ocean Plastic Intelligence & Drift Simulation</span></p>
+    <div class="landing-actions" data-depth="46"><span class="float-inner" data-depth="46">
+      <button id="enter-platform" class="enter-btn auto-pulse"><span class="float-inner-btn" data-depth="60">进入主平台 <span class="arrow">→</span></span></button>
+    </span></div>
+    <div class="meta-line" data-depth="38"><span class="float-inner meta-float" data-depth="38">
+      <span class="tag">实时刷新</span>
+      <span class="tag">OWID / OSCAR / OBIS</span>
+      <span class="tag">双源回退</span>
+    </span></div>
+    <div class="landing-footer-note" data-depth="30"><span class="float-inner" data-depth="30">若网络受限将自动使用模拟数据 (file:// 模式提示)</span></div>
+    <div class="site-label" data-depth="24"><span class="float-inner" data-depth="24">Ocean Plastic Intelligence ©</span></div>
+  </main>
+  </div>
+  <footer class="landing-footer">© 2025 Ocean Plastic Visualization Project</footer>
+
+  <script>
+    // 初始显示动画：给 body 添加 .reveal 让英雄卡片淡入
+    document.addEventListener('DOMContentLoaded',()=>{
+      document.body.classList.add('reveal');
+      // 标题可见性自检：若高度过小或计算颜色透明，降级为纯色显示
+      const title=document.querySelector('h1.landing-title');
+      if(title){
+        const rect=title.getBoundingClientRect();
+        const style=getComputedStyle(title);
+        const invisible=(rect.height < 10) || (style.color==='rgba(0, 0, 0, 0)' && !style.backgroundImage);
+        if(invisible){
+          title.classList.add('landing-title-fallback');
+        }
+      }
+    });
+    // 背景视频加载回退
+    (function initBg(){
+      const v=document.getElementById('bg-video'); if(!v) return;
+      let loaded=false; const to=setTimeout(()=>{ if(!loaded && v.parentElement){ v.parentElement.removeChild(v); console.warn('[Landing] 背景视频超时，使用静态背景'); } },12000);
+      v.addEventListener('canplay',()=>{ loaded=true; clearTimeout(to); v.classList.add('bg-video-ready'); },{once:true});
+      v.addEventListener('error',()=>{ clearTimeout(to); if(v.parentElement){ v.parentElement.removeChild(v); console.warn('[Landing] 背景视频失败'); } });
+    })();
+    // 自适应偏移：窗口高于 820 几乎居中；越矮越向上抬，避免下方被遮挡
+    (function adaptiveHeroOffset(){
+      const card=document.getElementById('hero-card'); if(!card) return;
+      function apply(){
+        const h=window.innerHeight;
+        // 820 以上 0px；高度下降，每下降 1px 增加 0.25px 上移（正值向下? 这里保持下移为正）
+        let raw=(820 - h)*0.25; // h<820 -> 正值
+        if(raw < 0) raw=0; if(raw>140) raw=140; // clamp
+        card.style.setProperty('--hero-offset', raw+'px');
+      }
+      apply();
+      window.addEventListener('resize', apply);
+    })();
+
+    // file:// 检测提示
+    if(location.protocol==='file:'){ window.__FILE_MODE__=true; console.warn('[Landing] file:// 模式，主平台将使用模拟数据'); }
+
+    // 进入主平台按钮
+    document.getElementById('enter-platform').addEventListener('click',()=>{ window.location.href='main.html'; });
+    document.addEventListener('keydown',e=>{ if(e.key==='Enter'){ document.getElementById('enter-platform').click(); } });
+
+    // 背景音乐控制
+    (function initMusic(){
+      const audio=document.getElementById('bg-music');
+      const btn=document.getElementById('music-toggle');
+      if(!audio||!btn) return;
+      let firstInteraction=false;
+      function applyState(){
+        if(audio.muted || audio.paused){ btn.classList.add('muted'); } else { btn.classList.remove('muted'); }
+      }
+      function ensurePlay(){
+        if(!firstInteraction){
+          firstInteraction=true;
+          audio.muted=false; audio.volume=0.5;
+          audio.play().catch(()=>{});
+          btn.classList.remove('muted');
+        }
+      }
+      btn.addEventListener('click',()=>{
+        ensurePlay();
+        if(audio.paused){ audio.play().catch(()=>{}); } else { audio.pause(); }
+        applyState();
+      });
+      window.addEventListener('pointerdown', ()=>{ ensurePlay(); applyState(); }, { once:true });
+    })();
+
+    /* Cursor Glow 背景光斑 */
+    (function initCursorGlow(){
+      const glow=document.getElementById('cursor-glow');
+      if(!glow) return;
+      let targetX=window.innerWidth/2, targetY=window.innerHeight/2;
+      let currX=targetX, currY=targetY;
+      const lerp=(a,b,t)=>a+(b-a)*t;
+      function raf(){
+        currX=lerp(currX,targetX,0.12);
+        currY=lerp(currY,targetY,0.12);
+        glow.style.transform=`translate(-50%,-50%) translate(${currX}px,${currY}px)`;
+        requestAnimationFrame(raf);
+      }
+      raf();
+      const moveHandler=e=>{ targetX=e.clientX; targetY=e.clientY; };
+      window.addEventListener('pointermove',moveHandler,{passive:true});
+      window.addEventListener('resize',()=>{ targetX=window.innerWidth/2; targetY=window.innerHeight/2; });
+      if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+        window.removeEventListener('pointermove',moveHandler);
+        glow.style.opacity='0.35';
+      }
+    })();
+
+    // 英雄卡片 3D 倾斜 + 深度视差
+    (function initTilt(){
+      const card=document.getElementById('hero-card');
+      const glare=document.getElementById('card-glare');
+  // 移除背景视差：只保留卡片内部层次位移
+      if(!card) return;
+      const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const fine=window.matchMedia('(pointer:fine)').matches;
+      if(reduce || !fine) return;
+  const MAX=32; let enabled=true; let rafId=null; // 再增大角度提高可感知度
+      // 启用全局透视类（explore.css 中 body.landing-body.tilt-active 提供额外 perspective）
+      document.body.classList.add('tilt-active');
+      const depthEls=[...card.querySelectorAll('[data-depth]')];
+      function apply(e){
+        if(!enabled) return;
+        const r=card.getBoundingClientRect();
+        const x=(e.clientX - r.left)/r.width; const y=(e.clientY - r.top)/r.height;
+        const rx=(y-0.5)*MAX; const ry=(x-0.5)*-MAX;
+        const intensity=0.35 + Math.abs(x-0.5)*0.35 + Math.abs(y-0.5)*0.35;
+        if(rafId) cancelAnimationFrame(rafId);
+        rafId=requestAnimationFrame(()=>{
+          card.style.setProperty('--rx', rx+'deg');
+          card.style.setProperty('--ry', ry+'deg');
+          // 动态阴影：阴影偏移与倾斜方向相反以模拟光源居中
+          const shadowX=(-ry/MAX)*22; // rotateY 正右倾 -> 阴影向左偏移
+          const shadowY=(rx/MAX)*22;  // rotateX 前后倾斜 -> 阴影上下偏移
+          card.style.setProperty('--shadow-x', shadowX+'px');
+          card.style.setProperty('--shadow-y', shadowY+'px');
+          card.classList.add('glare-active');
+          const gx=x*100, gy=y*100;
+          glare.style.background=`radial-gradient(circle at ${gx}% ${gy}%, rgba(255,255,255,${0.55*intensity}), rgba(255,255,255,0.05) 42%, rgba(255,255,255,0) 72%)`;
+          depthEls.forEach(el=>{
+            const d=+el.dataset.depth||0;
+            const factor = 0.65;
+            const dx=(x-0.5)*-d*factor;
+            const dy=(y-0.5)*-d*factor;
+            const dz=d*0.85;
+            el.style.setProperty('--px', dx+'px');
+            el.style.setProperty('--py', dy+'px');
+            el.style.setProperty('--pz', dz+'px');
+          });
+        });
+      }
+      function reset(){
+        if(rafId) cancelAnimationFrame(rafId);
+        card.style.setProperty('--rx','0deg');
+        card.style.setProperty('--ry','0deg');
+        card.style.setProperty('--shadow-x','0px');
+        card.style.setProperty('--shadow-y','0px');
+        glare.style.background='radial-gradient(circle at 50% 50%, rgba(255,255,255,.25), rgba(255,255,255,0.05) 42%, rgba(255,255,255,0) 72%)';
+        card.classList.remove('glare-active');
+  depthEls.forEach(el=>{ el.style.setProperty('--px','0px'); el.style.setProperty('--py','0px'); el.style.setProperty('--pz','0px'); });
+      }
+      card.addEventListener('mousemove',apply);
+      card.addEventListener('mouseleave',reset);
+      card.addEventListener('mousedown',()=>{ if(!enabled) return; card.style.setProperty('--scale','0.96'); });
+      card.addEventListener('mouseup',()=>{ card.style.setProperty('--scale','1'); });
+      window.disableLandingTilt=()=>{ enabled=false; reset(); console.log('[LandingTilt] disabled'); };
+      window.enableLandingTilt=()=>{ enabled=true; console.log('[LandingTilt] enabled'); };
+      // 可通过 window.setHeroOffset(px) 动态调节垂直位置
+      window.setHeroOffset=(px)=>{ card.style.setProperty('--hero-offset', px+'px'); };
+    })();
+    // 渐变不可见回退样式注入
+    (function injectTitleFallback(){
+      const css=`.landing-title-fallback{background:none!important;-webkit-background-clip:initial!important;background-clip:initial!important;color:#e8fcff!important;-webkit-text-fill-color:#e8fcff!important;}`;
+      const style=document.createElement('style'); style.textContent=css; document.head.appendChild(style);
+    })();
+  </script>
+</body>
+</html>

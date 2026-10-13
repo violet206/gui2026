@@ -1,0 +1,268 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"/><title>情景对比 · Scenario Compare</title><meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="stylesheet" href="styles.css"/><link rel="stylesheet" href="shared-ui.css"/><script src="utils.js"></script><style>/* --- 背景与基础 --- */html,body{height:100%;}body{margin:0;font-family:Roboto,Arial,sans-serif;min-height:100%;display:flex;flex-direction:column;background:transparent;overflow:hidden;}body.themed-page:before{content:"";position:fixed;inset:0;background:radial-gradient(circle at 42% 38%,rgba(40,120,160,.28),rgba(5,25,45,.9));z-index:-3;}video.bg-video{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:-4;opacity:0;transition:opacity 1.2s ease;filter:brightness(.9) saturate(1.06);}video.bg-video.ready{opacity:1}header{display:flex;justify-content:space-between;align-items:center;padding:14px 26px;background:linear-gradient(145deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.14);backdrop-filter:blur(14px) saturate(1.35);border-radius:0 0 26px 26px;box-shadow:0 10px 30px -10px rgba(0,0,0,0.6);}main{flex:1 1 auto;display:flex;flex-direction:column;padding:24px 30px 26px;gap:20px;min-height:0;overflow:hidden;}/* --- 左右独立滚动 (body 禁止滚动) --- */.layout{display:grid;grid-template-columns:320px 1fr;gap:22px;flex:1 1 auto;min-height:0;height:100%;}@media (max-width:1180px){.layout{grid-template-columns:300px 1fr;}}@media (max-width:960px){.layout{grid-template-columns:1fr;grid-auto-rows:minmax(260px,auto);} .panel.scroll-col{max-height:420px;}}.panel{background:linear-gradient(145deg,rgba(255,255,255,0.07),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.12);padding:18px 20px;border-radius:22px;display:flex;flex-direction:column;min-height:0;box-shadow:0 8px 28px -8px rgba(0,0,0,0.55);backdrop-filter:blur(14px) saturate(1.35);}h3{margin:0 0 12px;font-size:16px;letter-spacing:.5px;color:#d6f3ff}.scroll-col{overflow-y:auto;scrollbar-width:thin;}.scroll-col::-webkit-scrollbar{width:8px}.scroll-col::-webkit-scrollbar-track{background:rgba(255,255,255,0.05)}.scroll-col::-webkit-scrollbar-thumb{background:linear-gradient(180deg,rgba(255,255,255,0.18),rgba(255,255,255,0.08));border-radius:8px;border:1px solid rgba(255,255,255,0.25)}.sc-list{display:flex;flex-direction:column;gap:8px}.sc-item{display:flex;align-items:center;gap:6px;font-size:13px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);padding:7px 10px;border-radius:12px;cursor:pointer;transition:background .25s,border-color .25s,transform .25s}.sc-item:hover{background:rgba(255,255,255,0.08);transform:translateY(-2px)}.sc-item.active{box-shadow:0 0 0 2px #35c4ff inset;background:rgba(0,160,230,0.18)}.charts-wrap{display:flex;flex-direction:column;gap:16px;min-height:0;}.charts-grid{display:grid;grid-auto-rows:310px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;align-content:start;padding:2px;min-height:0;}.chart-card{position:relative;display:flex;flex-direction:column;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:18px;padding:10px 12px;overflow:hidden;backdrop-filter:blur(12px) saturate(1.2);box-shadow:0 4px 18px -6px rgba(0,0,0,0.55)}.chart-card h4{margin:0 0 6px;font-size:12px;letter-spacing:.5px;color:#d6f3ff;font-weight:500;display:flex;justify-content:space-between;align-items:center}.chart-card canvas{flex:1 1 auto;width:100%!important;height:100%!important}.chart-meta{font-size:10px;color:#9dc4d8;margin-top:4px;display:flex;gap:10px;flex-wrap:wrap}.metrics-box{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:18px;padding:12px 16px;font-size:12px;display:flex;flex-wrap:wrap;gap:12px;backdrop-filter:blur(12px) saturate(1.25);}.metrics-box .metric{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.14);padding:6px 10px;border-radius:10px;font-size:11px;display:flex;flex-direction:column;gap:2px;min-width:110px;transition:.25s}.metrics-box .metric b{color:#ffe29f;font-weight:600;font-size:13px}.metrics-box .metric:hover{box-shadow:0 0 0 2px rgba(255,226,159,0.3);transform:translateY(-2px)}.panel small.note{font-size:11px;color:#82c6e2;line-height:1.4;margin-top:4px;display:block}</style></head><body class="themed-page"><video class="bg-video" id="bgVid" muted autoplay playsinline loop preload="auto" poster="imgs/deep_blue_ocean_gradient_abstract_background_scientific.jpg"><source src="https://cdn.pixabay.com/video/2016/09/13/5200-183786525_large.mp4" type="video/mp4"></video><header class="frost-header"><div>🧪 情景对比</div><nav><a href="main.html" class="back-link small">← 返回主页面</a></nav></header><main>
+<div class="layout">
+  <div class="panel scroll-col">
+  <h3 style="font-size:18px;letter-spacing:.5px;">情景列表 Scenarios</h3>
+    <div class="sc-list" id="scList"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
+      <button id="btnAdd" style="padding:6px 12px;border-radius:14px;background:#0d3850;border:1px solid #1e5d7a;color:#d2f4ff;cursor:pointer;flex:1;min-width:100px;">添加随机</button>
+      <button id="btnAddControl" style="padding:6px 12px;border-radius:14px;background:#1b3e52;border:1px solid #2e6d85;color:#ffe8b0;cursor:pointer;flex:1;min-width:100px;">添加对照组</button>
+      <button id="btnExport" style="padding:6px 12px;border-radius:14px;background:#163d54;border:1px solid #276986;color:#d2f4ff;cursor:pointer;flex:1;min-width:100px;">导出CSV</button>
+    </div>
+  </div>
+  <div class="panel scroll-col" style="min-height:0;">
+    <h3 style="margin-bottom:4px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">对比视图 Compare View <span id="scenarioCount" style="font-size:11px;color:#9dc4d8;letter-spacing:.5px;">(0)</span></h3>
+    <div class="charts-wrap">
+      <div id="overlayCard" class="chart-card" style="height:260px;display:none;">
+        <h4 style="margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;"><span>多情景叠加 Overlay</span><span id="overlayInfo" style="font-size:10px;color:#9dc4d8;"></span></h4>
+        <canvas id="overlayCanvas"></canvas>
+        <div class="chart-meta" style="font-size:10px;color:#9dc4d8;">(勾选左侧复选框以加入叠加)</div>
+      </div>
+      <!-- metricsBox 移动：放到 overlayCard 正下方 -->
+      <div id="metricsBox" class="metrics-box" style="margin-top:2px;">(指标等待情景)</div>
+      <div id="chartsGrid" class="charts-grid"></div>
+    </div>
+  </div>
+</div>
+</main>
+<script>
+const U=window.__UTILS__;
+let scenarios=[];
+let activeIdx=null;
+const listEl=document.getElementById('scList');
+const gridEl=document.getElementById('chartsGrid');
+const metricsEl=document.getElementById('metricsBox');
+const countEl=document.getElementById('scenarioCount');
+const chartRefs=new Map();
+let overlayChart=null;
+const overlayCard=document.getElementById('overlayCard');
+const overlayCanvas=document.getElementById('overlayCanvas');
+const overlayInfo=document.getElementById('overlayInfo');
+const COLOR_PALETTE=['#4cc9f0','#ffb703','#90be6d','#f94144','#f3722c','#577590','#b5179e','#43aa8b','#f9c74f','#4895ef'];
+let overlayUnifiedScale=false; // 统一Y轴开关
+let overlaySmoothing=false; // 平滑开关
+
+function addScenario(){
+  const s={
+    id: 'sc_'+(Date.now())+'_'+scenarios.length,
+    name:'S'+(scenarios.length+1),
+    params:{ drift: +(Math.random()*1.2).toFixed(2), cleanup: +(Math.random()*100).toFixed(1) },
+    metrics:{ retention: +(Math.random()*80+10).toFixed(1), coastHit: +(Math.random()*50).toFixed(1) },
+    series: Array.from({length: 18 + Math.floor(Math.random()*8)}, (_,i)=> +( 50 + i*U.rand(-2,5) + Math.random()*10 ).toFixed(2)),
+    include:true
+  };
+  scenarios.push(s);
+  renderList();
+  renderScenarioChartCard(s);
+  if(scenarios.length===1){ setActive(0);} else { updateMetricsAggregate(); }
+  updateOverlayChart();
+}
+
+function addControlScenario(){
+  if(scenarios.some(s=>s.isControl)) { alert('对照组已存在'); return; }
+  const len=24; let v=55; const series=[]; for(let i=0;i<len;i++){ v+=U.rand(-1,1.2); series.push(+v.toFixed(2)); }
+  const ctrl={ id:'ctrl_'+Date.now(), name:'CTRL', isControl:true, params:{drift:1.0, cleanup:0}, metrics:{retention:50, coastHit:20}, series, include:true };
+  scenarios.unshift(ctrl);
+  rebuildAllScenarioCards();
+  setActive(0);
+  updateOverlayChart();
+  const btn=document.getElementById('btnAddControl'); if(btn){ btn.disabled=true; btn.style.opacity=.55; btn.title='已存在对照组'; }
+}
+
+function renderList(){
+  listEl.innerHTML='';
+  scenarios.forEach((s,i)=>{
+    const d=document.createElement('div');
+    d.className='sc-item'+(i===activeIdx?' active':'')+(s.isControl?' control':'');
+    d.innerHTML='<input type="radio" name="scSel" '+(i===activeIdx?'checked':'')+' title="设为焦点">'+
+      ' <input type="checkbox" class="ov-inc" '+(s.include?'checked':'')+' title="加入叠加"> '+
+      '<span>'+(s.isControl?'<strong style="color:#ffe29f">[C]</strong> ':'')+s.name+'</span><span style="opacity:.55"> drift:'+s.params.drift+'</span>'+
+      '<button class="del" title="'+(s.isControl?'对照组不可删除':'删除')+'" style="margin-left:auto;background:transparent;border:0;'+(s.isControl?'color:#886;opacity:.4;cursor:not-allowed;':'color:#ff9d9d;cursor:pointer;')+'font-size:14px;line-height:1;padding:0 4px;">×</button>';
+    d.addEventListener('click',()=>setActive(i));
+    const radio=d.querySelector('input[type=radio]');
+    radio.addEventListener('click',e=>{ e.stopPropagation(); setActive(i); });
+    const chk=d.querySelector('.ov-inc');
+    chk.addEventListener('click',e=>{ e.stopPropagation(); s.include = e.target.checked; updateOverlayChart(); });
+    const delBtn=d.querySelector('.del');
+    delBtn.addEventListener('click',e=>{ e.stopPropagation(); if(s.isControl) return; deleteScenario(s.id); });
+    listEl.appendChild(d);
+  });
+  countEl.textContent='('+scenarios.length+')';
+}
+
+async function ensureChart(){ return !!(await U.ensureChartJS()); }
+
+async function setActive(idx){
+  activeIdx=idx;
+  renderList();
+  const s=scenarios[idx];
+  if(!s) return;
+  highlightCard(s.id);
+  updateMetricsSingle(s);
+}
+
+function highlightCard(id){
+  gridEl.querySelectorAll('.chart-card').forEach(c=>{ c.style.outline='none'; c.style.boxShadow='none'; });
+  const card=document.getElementById('card_'+id);
+  if(card){ card.style.outline='1px solid rgba(53,196,255,0.9)'; card.style.boxShadow='0 0 0 2px rgba(53,196,255,0.35)'; card.scrollIntoView({behavior:'smooth',block:'nearest',inline:'nearest'}); }
+}
+
+function renderScenarioChartCard(s){
+  if(!gridEl) return;
+  const card=document.createElement('div');
+  card.className='chart-card';
+  card.id='card_'+s.id;
+  card.innerHTML='<h4><span>'+(s.isControl? '对照组 Control' : s.name) + '</span><span style="font-size:10px;color:#9dc4d8;">drift '+s.params.drift+' · cleanup '+s.params.cleanup+'%</span></h4><canvas></canvas><div class="chart-meta"></div>';
+  gridEl.appendChild(card);
+  ensureChart().then(ok=>{ if(!ok){ card.querySelector('.chart-meta').textContent='Chart.js 不可用'; return; } buildChartForScenario(s, card.querySelector('canvas')); });
+  card.onclick=()=>{ const idx=scenarios.findIndex(x=>x.id===s.id); if(idx>-1) setActive(idx); };
+}
+
+function rebuildAllScenarioCards(){
+  chartRefs.forEach(ch=>{ try{ ch.destroy(); }catch(e){} });
+  chartRefs.clear();
+  gridEl.querySelectorAll('.chart-card').forEach(c=>{ if(c.id!=='overlayCard') c.remove(); });
+  scenarios.forEach(s=> renderScenarioChartCard(s));
+  renderList();
+}
+
+function buildChartForScenario(s, canvas, attempt=0){
+  if(!canvas) return;
+  // 如果容器仍未布局完成导致宽度很小，稍后重试，避免 0 宽初始化造成看不到折线 (S2 缺线问题修复)
+  const cw = canvas.clientWidth || canvas.parentElement.clientWidth;
+  if(cw < 40 && attempt < 6){
+    return setTimeout(()=>buildChartForScenario(s, canvas, attempt+1), 130);
+  }
+  const ctx=canvas.getContext('2d');
+  if(chartRefs.has(s.id)){ try{ chartRefs.get(s.id).destroy(); }catch(e){} }
+  const diff = s.series.map(v=> v * (0.85 + Math.random()*0.3));
+  try{
+    const ch=new Chart(ctx, {
+      type:'line',
+      data:{ labels: s.series.map((_,i)=> i), datasets:[
+        {label:s.name+' 原始', data:s.series, borderColor:'#4cc9f0', tension:.25, pointRadius:0, borderWidth:2},
+        {label:'对照Alt', data:diff, borderColor:'#ffb703', tension:.25, pointRadius:0, borderWidth:2}
+      ]},
+      options:{ maintainAspectRatio:false, animation:{ duration:400 },
+        plugins:{ legend:{ labels:{ color:'#d6f2ff', boxHeight:10 } } },
+        scales:{ x:{ ticks:{ color:'#9dc2d4' } }, y:{ ticks:{ color:'#9dc2d4' }, grid:{ color:'rgba(255,255,255,0.08)' } } }
+      }
+    });
+    chartRefs.set(s.id, ch);
+    // 二次 resize 保障 (布局完成后再刷新一次)
+    setTimeout(()=>{ try{ ch.resize(); }catch(e){} }, 220);
+  }catch(err){
+    console.warn('Chart build failed, retrying...', err);
+    if(attempt < 6) setTimeout(()=>buildChartForScenario(s, canvas, attempt+1), 200);
+  }
+}
+
+function updateMetricsSingle(s){
+  metricsEl.innerHTML = '<div class="metric"><span>Retention</span><b>'+s.metrics.retention+'%</b></div>'+
+    '<div class="metric"><span>Coast Hit</span><b>'+s.metrics.coastHit+'%</b></div>'+
+    '<div class="metric"><span>Drift</span><b>'+s.params.drift+'</b></div>'+
+    '<div class="metric"><span>Cleanup</span><b>'+s.params.cleanup+'%</b></div>'+
+    '<div class="metric"><span>Length</span><b>'+s.series.length+'</b></div>';
+}
+
+function updateMetricsAggregate(){
+  if(!scenarios.length) { metricsEl.textContent='(无情景)'; return; }
+  const avg=(arr)=> (arr.reduce((a,b)=>a+Number(b||0),0)/arr.length).toFixed(1);
+  const retAvg=avg(scenarios.map(s=>+s.metrics.retention));
+  const coastAvg=avg(scenarios.map(s=>+s.metrics.coastHit));
+  metricsEl.innerHTML = '<div class="metric"><span>Retention AVG</span><b>'+retAvg+'%</b></div>'+
+    '<div class="metric"><span>Coast Hit AVG</span><b>'+coastAvg+'%</b></div>'+
+    '<div class="metric"><span>Scenarios</span><b>'+scenarios.length+'</b></div>';
+}
+
+window.addEventListener('resize', ()=>{ chartRefs.forEach(ch=>{ try{ ch.resize(); }catch(e){} }); });
+
+function deleteScenario(id){
+  const idx=scenarios.findIndex(s=>s.id===id);
+  if(idx===-1) return;
+  if(scenarios[idx].isControl){ return; }
+  // destroy chart
+  if(chartRefs.has(id)) { try{ chartRefs.get(id).destroy(); }catch(e){} chartRefs.delete(id); }
+  // remove DOM card
+  const card=document.getElementById('card_'+id); if(card && card.parentNode) card.parentNode.removeChild(card);
+  const wasActive = (idx===activeIdx);
+  scenarios.splice(idx,1);
+  if(!scenarios.length){ activeIdx=null; metricsEl.textContent='(无情景)'; }
+  else if(wasActive){ activeIdx = Math.min(idx, scenarios.length-1); setActive(activeIdx); }
+  renderList();
+  updateOverlayChart();
+  if(!wasActive && activeIdx!=null){ updateMetricsSingle(scenarios[activeIdx]); }
+}
+
+function exportScenariosCSV(){
+  if(!scenarios.length){ alert('无情景可导出'); return; }
+  let lines=['scenarioId,name,drift,cleanup,retention,coastHit,length,seriesIndex,seriesValue'];
+  scenarios.forEach(s=>{
+    s.series.forEach((v,i)=>{
+      lines.push([s.id,s.name,s.params.drift,s.params.cleanup,s.metrics.retention,s.metrics.coastHit,s.series.length,i,v].join(','));
+    });
+  });
+  const csv='\ufeff'+lines.join('\r\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='scenarios_'+Date.now()+'.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+
+function updateOverlayChart(){
+  const included = scenarios.filter(s=>s.include);
+  if(!included.length){
+    if(overlayChart){ try{ overlayChart.destroy(); }catch(e){} overlayChart=null; }
+    overlayCard.style.display='none';
+    overlayInfo.textContent='';
+    return;
+  }
+  overlayCard.style.display='flex';
+  ensureChart().then(ok=>{
+    if(!ok){ return; }
+    const maxLen = included.reduce((m,s)=> Math.max(m,s.series.length),0);
+    const labels = Array.from({length:maxLen}, (_,i)=> i);
+    // 确保对照组优先（底层）: 放在数组第一位
+    included.sort((a,b)=> (b.isControl?1:0) - (a.isControl?1:0));
+    const datasets = included.map((s,idx)=>{
+      const arr=new Array(maxLen).fill(null);
+      for(let i=0;i<s.series.length;i++) arr[i]=s.series[i];
+      const rawData=[...arr];
+      if(overlaySmoothing){ // 简单移动平均窗口=3
+        const win=3; for(let i=0;i<rawData.length;i++){ if(rawData[i]==null) continue; let sum=0,c=0; for(let j=i-Math.floor(win/2); j<=i+Math.floor(win/2); j++){ if(j>=0 && j<rawData.length && rawData[j]!=null){ sum+=rawData[j]; c++; } } arr[i]= +(sum/(c||1)).toFixed(2); }
+      }
+      const color = s.isControl? '#ffffff' : COLOR_PALETTE[idx % COLOR_PALETTE.length];
+      return { label:s.name + (s.isControl?'(C)':''), data:arr, borderColor:color, tension:.25, fill:false, pointRadius:0, borderWidth: s.isControl?2.4:2, _sid:s.id };
+    });
+    if(overlayChart){ try{ overlayChart.destroy(); }catch(e){} }
+    const ctx=overlayCanvas.getContext('2d');
+    const globalMax = datasets.reduce((m,d)=> Math.max(m, ...d.data.filter(v=>v!=null)), 0);
+    overlayChart=new Chart(ctx,{ type:'line', data:{ labels, datasets }, options:{ maintainAspectRatio:false, plugins:{ legend:{ labels:{ color:'#d6f2ff', boxHeight:10 }, onClick:(e, li, legend)=>{ const dsIndex=li.datasetIndex; const ds=legend.chart.data.datasets[dsIndex]; if(ds){ const card=document.getElementById('card_'+ds._sid); if(card){ card.style.outline='2px solid #ffe29f'; card.style.boxShadow='0 0 0 3px rgba(255,226,159,0.35)'; card.scrollIntoView({behavior:'smooth',block:'nearest'}); setTimeout(()=>{ card.style.outline='1px solid rgba(53,196,255,0.9)'; card.style.boxShadow='0 0 0 2px rgba(53,196,255,0.35)'; },1200); } } const ci=legend.chart; const meta=ci.getDatasetMeta(dsIndex); meta.hidden = meta.hidden===null? !ci.data.datasets[dsIndex].hidden : null; ci.update(); } } }, scales:{ x:{ ticks:{ color:'#9dc2d4' } }, y:{ ticks:{ color:'#9dc2d4' }, suggestedMin:0, suggestedMax: overlayUnifiedScale? (globalMax*1.05): undefined, grid:{ color:'rgba(255,255,255,0.08)' } } } } });
+    overlayInfo.textContent='情景数 '+included.length+' · 长度 '+maxLen + (overlayUnifiedScale?' · 统一Y':'');
+  });
+}
+
+function toggleOverlayY(){ overlayUnifiedScale=!overlayUnifiedScale; updateOverlayChart(); }
+function toggleOverlaySmoothing(){ overlaySmoothing=!overlaySmoothing; updateOverlayChart(); }
+
+document.getElementById('btnAdd').onclick=addScenario;
+document.getElementById('btnExport').onclick=exportScenariosCSV;
+document.getElementById('btnAddControl').onclick=addControlScenario;
+// 给 overlay 面板增加一个 Y 轴切换按钮（初始化后插入）
+if(overlayCard){
+  const yBtn=document.createElement('button');
+  yBtn.textContent='Y轴切换';
+  yBtn.style.cssText='position:absolute;top:6px;right:10px;background:#21485f;color:#d6f2ff;border:1px solid #2c6b82;font-size:10px;padding:2px 6px;border-radius:8px;cursor:pointer;';
+  yBtn.onclick=toggleOverlayY; overlayCard.appendChild(yBtn);
+  const sBtn=document.createElement('button');
+  sBtn.textContent='平滑';
+  sBtn.style.cssText='position:absolute;top:6px;right:70px;background:#21485f;color:#d6f2ff;border:1px solid #2c6b82;font-size:10px;padding:2px 6px;border-radius:8px;cursor:pointer;';
+  sBtn.onclick=()=>{ toggleOverlaySmoothing(); sBtn.style.background = overlaySmoothing? '#2c6b82':'#21485f'; }; overlayCard.appendChild(sBtn);
+}
+// 初始化仅 1 个随机情景（用户反馈：默认不再自动生成 S2）
+addScenario();
+// 可按需再点击“添加对照组”加入 CTRL
+// 背景视频就绪标记
+(function(){const v=document.getElementById('bgVid');if(!v) return;let ok=false;const to=setTimeout(()=>{if(!ok) v.parentNode&&v.parentNode.removeChild(v);},12000);v.addEventListener('canplay',()=>{ok=true;clearTimeout(to);v.classList.add('ready');},{once:true});v.addEventListener('error',()=>{clearTimeout(to);v.parentNode&&v.parentNode.removeChild(v);});})();
+</script></body></html>
